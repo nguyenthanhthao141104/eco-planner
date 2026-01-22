@@ -6,16 +6,37 @@ import { authMiddleware, adminMiddleware } from '../middleware/auth';
 const router = Router();
 const SETTINGS_PATH = path.join(__dirname, '../config/settings.json');
 
+const DEFAULT_SETTINGS = {
+    branding: {
+        facebook: 'https://facebook.com',
+        instagram: 'https://instagram.com',
+        hotline: '1900 1234'
+    },
+    ai: {
+        greeting: 'Chào mừng bạn đến với MEDE! Tôi có thể giúp gì cho bạn?'
+    },
+    payment: {
+        bankName: 'Vietcombank',
+        accountNumber: '1234567890',
+        accountHolder: 'ECO PLANNER',
+        transferContent: 'THANH TOAN DON HANG'
+    },
+    seo: {
+        metaDescription: 'ECO PLANNER - Planner cao cấp cho cuộc sống cân bằng'
+    }
+};
+
 // Helper to read settings
 const readSettings = () => {
     try {
         if (!fs.existsSync(SETTINGS_PATH)) {
-            return {};
+            return DEFAULT_SETTINGS;
         }
-        return JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf8'));
+        const data = fs.readFileSync(SETTINGS_PATH, 'utf8');
+        return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
     } catch (error) {
         console.error('Error reading settings:', error);
-        return {};
+        return DEFAULT_SETTINGS;
     }
 };
 

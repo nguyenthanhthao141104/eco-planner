@@ -134,7 +134,7 @@ const PublicLayout: React.FC = () => {
           </div>
           <p className="text-sm text-charcoal/60">© 2026 MEDE. Designed for balance.</p>
           <div className="flex gap-4">
-            {settings?.branding.instagram && (
+            {settings?.branding?.instagram && (
               <a
                 href={settings.branding.instagram.startsWith('http') ? settings.branding.instagram : `https://${settings.branding.instagram}`}
                 target="_blank"
@@ -144,7 +144,7 @@ const PublicLayout: React.FC = () => {
                 <Instagram className="w-4 h-4" /> Instagram
               </a>
             )}
-            {settings?.branding.facebook && (
+            {settings?.branding?.facebook && (
               <a
                 href={settings.branding.facebook.startsWith('http') ? settings.branding.facebook : `https://${settings.branding.facebook}`}
                 target="_blank"
@@ -154,7 +154,7 @@ const PublicLayout: React.FC = () => {
                 <Facebook className="w-4 h-4" /> Facebook
               </a>
             )}
-            {settings?.branding.hotline && (
+            {settings?.branding?.hotline && (
               <a href={`tel:${settings.branding.hotline}`} className="text-charcoal/60 hover:text-primary transition-colors flex items-center gap-1">
                 <Phone className="w-4 h-4" /> {settings.branding.hotline}
               </a>
@@ -202,7 +202,7 @@ const PublicLayout: React.FC = () => {
                     <Sparkles className="w-3 h-3 text-primary" />
                   </div>
                   <div className="bg-white p-3 rounded-2xl rounded-tl-sm text-sm shadow-sm border border-stone-100 text-charcoal/80">
-                    {settings?.ai.greeting || "Xin chào! Mình là MEDE-Assistant 🌿. Bạn cần hỗ trợ gì về sản phẩm văn phòng phẩm thân thiện môi trường?"}
+                    {settings?.ai?.greeting || "Xin chào! Mình là MEDE-Assistant 🌿. Bạn cần hỗ trợ gì về sản phẩm văn phòng phẩm thân thiện môi trường?"}
                   </div>
                 </div>
               ) : (

@@ -16,7 +16,21 @@ const Settings: React.FC = () => {
     const loadSettings = async () => {
         try {
             const data = await api.getSettings();
-            setSettings(data);
+            // Provide defaults if data is partial/empty to prevent crashes
+            const defaults: SystemSettings = {
+                branding: { facebook: '', instagram: '', hotline: '' },
+                ai: { greeting: '' },
+                payment: { bankName: '', accountNumber: '', accountHolder: '', transferContent: '' },
+                seo: { metaDescription: '' }
+            };
+            setSettings({
+                ...defaults,
+                ...data,
+                branding: { ...defaults.branding, ...data.branding },
+                ai: { ...defaults.ai, ...data.ai },
+                payment: { ...defaults.payment, ...data.payment },
+                seo: { ...defaults.seo, ...data.seo }
+            });
         } catch (error) {
             console.error('Failed to load settings:', error);
         } finally {
