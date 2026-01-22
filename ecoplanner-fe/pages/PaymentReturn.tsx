@@ -10,36 +10,18 @@ const PaymentReturn: React.FC = () => {
 
     useEffect(() => {
         const verifyPayment = async () => {
-            // Check for VNPay return params
-            const vnpResponseCode = searchParams.get('vnp_ResponseCode');
-            const vnpTxnRef = searchParams.get('vnp_TxnRef');
-
-            // Check for MoMo return params  
-            const momoOrderId = searchParams.get('orderId');
-            const resultCode = searchParams.get('resultCode');
-
-            // Check for COD/Bank success
+            // Backend redirect with success parameter (VNPay)
+            const success = searchParams.get('success');
+            const orderId = searchParams.get('orderId');
             const method = searchParams.get('method');
 
-            if (vnpTxnRef) {
-                // VNPay return
-                setOrderId(vnpTxnRef);
-                if (vnpResponseCode === '00') {
-                    setStatus('success');
-                } else {
-                    setStatus('failed');
-                }
-            } else if (momoOrderId) {
-                // MoMo return
-                setOrderId(momoOrderId);
-                if (resultCode === '0') {
-                    setStatus('success');
-                } else {
-                    setStatus('failed');
-                }
-            } else if (method && searchParams.get('orderId')) {
-                // COD/Bank method
-                setOrderId(searchParams.get('orderId') || '');
+            if (success !== null) {
+                // VNPay/MoMo return from backend
+                setOrderId(orderId || '');
+                setStatus(success === 'true' ? 'success' : 'failed');
+            } else if (method && orderId) {
+                // COD/Bank method (direct from frontend)
+                setOrderId(orderId);
                 setStatus('success');
             } else {
                 setStatus('failed');

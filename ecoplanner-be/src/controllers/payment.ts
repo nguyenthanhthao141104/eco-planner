@@ -85,14 +85,15 @@ router.post('/vnpay', authMiddleware, async (req: AuthenticatedRequest, res: Res
         if (!order) return res.status(404).json({ error: 'Order not found' });
 
         const ipAddress = req.ip || req.socket.remoteAddress || '127.0.0.1';
-        const frontendUrl = paymentConfig.frontendUrl;
+        // Use backend returnUrl for security - backend will verify and redirect to frontend
+        // returnUrl is configured in VNPAY_RETURN_URL env var
 
         const result = await paymentService.createVnpayPayment(
             orderId,
             order.total,
             `Thanh toán đơn hàng #${orderId.slice(0, 8).toUpperCase()}`,
-            ipAddress,
-            `${frontendUrl}/payment/vnpay/return`
+            ipAddress
+            // returnUrl will use default from paymentConfig.vnpay.returnUrl
         );
 
         if (result.success) {
@@ -107,31 +108,37 @@ router.post('/vnpay', authMiddleware, async (req: AuthenticatedRequest, res: Res
 });
 
 // GET /api/payment/vnpay/return - VNPay return handler
+// This endpoint receives callback from VNPay, verifies signature, updates order, then redirects to frontend
 router.get('/vnpay/return', async (req: Request, res: Response) => {
     try {
         const query = req.query as Record<string, string>;
         const result = paymentService.verifyVnpayReturn(query);
+        const frontendUrl = paymentConfig.frontendUrl;
 
+        // Invalid signature - redirect to frontend with error
         if (!result.isValid) {
-            return res.json({ success: false, error: 'Invalid signature', orderId: result.orderId });
+            return res.redirect(`${frontendUrl}/payment/vnpay/return?success=false&orderId=${result.orderId}&error=invalid_signature`);
         }
 
+        // Payment successful
         if (result.isSuccess) {
             await prisma.order.update({
                 where: { id: result.orderId },
                 data: { status: 'CONFIRMED' },
             });
-            res.json({ success: true, orderId: result.orderId });
+            return res.redirect(`${frontendUrl}/payment/vnpay/return?success=true&orderId=${result.orderId}`);
         } else {
+            // Payment failed
             await prisma.order.update({
                 where: { id: result.orderId },
                 data: { status: 'CANCELLED' },
             });
-            res.json({ success: false, orderId: result.orderId });
+            return res.redirect(`${frontendUrl}/payment/vnpay/return?success=false&orderId=${result.orderId}`);
         }
     } catch (error) {
         console.error('VNPay return error:', error);
-        res.status(500).json({ error: 'Payment verification failed' });
+        const frontendUrl = paymentConfig.frontendUrl;
+        return res.redirect(`${frontendUrl}/payment/vnpay/return?success=false&error=server_error`);
     }
 });
 
