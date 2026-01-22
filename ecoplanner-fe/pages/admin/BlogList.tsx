@@ -103,7 +103,12 @@ const AdminBlogList: React.FC = () => {
                             <div className="col-span-1 md:col-span-6 flex items-center gap-5">
                                 <div className="h-16 w-24 rounded-xl bg-gray-100 overflow-hidden shrink-0">
                                     {post.image ? (
-                                        <img src={post.image} className="w-full h-full object-cover" alt={post.title} />
+                                        <img
+                                            src={post.image.startsWith('http') ? post.image : `${api.baseUrl}${post.image}`}
+                                            className="w-full h-full object-cover"
+                                            alt={post.title}
+                                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/96x64?text=ERR'; }}
+                                        />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-xs text-gray-400 font-bold uppercase">No Image</div>
                                     )}
@@ -119,9 +124,9 @@ const AdminBlogList: React.FC = () => {
                             </div>
                             <div className="col-span-1 md:col-span-2 flex md:justify-center">
                                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${post.type === 'ARTICLE' ? 'bg-blue-100 text-blue-700' :
-                                        post.type === 'QUOTE' ? 'bg-purple-100 text-purple-700' :
-                                            post.type === 'TIP' ? 'bg-orange-100 text-orange-700' :
-                                                'bg-green-100 text-green-700'
+                                    post.type === 'QUOTE' ? 'bg-purple-100 text-purple-700' :
+                                        post.type === 'TIP' ? 'bg-orange-100 text-orange-700' :
+                                            'bg-green-100 text-green-700'
                                     }`}>
                                     {post.type}
                                 </span>

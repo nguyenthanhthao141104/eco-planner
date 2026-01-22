@@ -55,7 +55,12 @@ const BlockRenderer: React.FC<{ block: BlogBlock, products?: Product[] }> = ({ b
                         className="flex items-center gap-6 p-6 rounded-3xl bg-white border border-stone-100 hover:border-primary/30 transition-all hover:shadow-xl group"
                     >
                         <div className="w-32 h-32 rounded-2xl overflow-hidden shrink-0">
-                            <img src={linkedProduct.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={linkedProduct.name} />
+                            <img
+                                src={linkedProduct.image?.startsWith('http') ? linkedProduct.image : `${api.baseUrl}${linkedProduct.image}`}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                alt={linkedProduct.name}
+                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/128?text=ERR'; }}
+                            />
                         </div>
                         <div className="flex-1">
                             <span className="text-primary font-bold text-xs uppercase tracking-widest mb-1 block">Sản phẩm nhắc đến</span>
@@ -151,9 +156,10 @@ const BlogDetail: React.FC = () => {
                 {post.image && (
                     <div className="mb-16 rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-black/5">
                         <img
-                            src={post.image.startsWith('http') ? post.image : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${post.image}`}
+                            src={post.image.startsWith('http') ? post.image : `${api.baseUrl}${post.image}`}
                             className="w-full h-auto object-cover max-h-[600px]"
                             alt={post.title}
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/850x500?text=ERR'; }}
                         />
                     </div>
                 )}
@@ -177,7 +183,12 @@ const BlogDetail: React.FC = () => {
                                     className="group"
                                 >
                                     <div className="aspect-square rounded-[2rem] overflow-hidden mb-6 shadow-sm group-hover:shadow-xl transition-all duration-500">
-                                        <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={product.name} />
+                                        <img
+                                            src={product.image?.startsWith('http') ? product.image : `${api.baseUrl}${product.image}`}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            alt={product.name}
+                                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=ERR'; }}
+                                        />
                                     </div>
                                     <h3 className="font-bold text-xl text-charcoal group-hover:text-primary transition-colors text-center">{product.name}</h3>
                                     <p className="text-primary font-black mt-2 text-2xl text-center">

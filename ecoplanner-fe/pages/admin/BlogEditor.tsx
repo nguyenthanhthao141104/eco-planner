@@ -240,7 +240,7 @@ const AdminBlogEditor: React.FC = () => {
                                 </div>
                                 {image && (
                                     <div className="w-48 h-32 rounded-2xl overflow-hidden ring-1 ring-stone-200 relative group">
-                                        <img src={image.startsWith('http') ? image : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${image}`} className="w-full h-full object-cover" alt="Cover" />
+                                        <img src={image.startsWith('http') ? image : `${api.baseUrl}${image}`} className="w-full h-full object-cover" alt="Cover" />
                                         <button onClick={() => setImage('')} className="absolute inset-0 bg-red-500/80 text-white font-bold opacity-0 group-hover:opacity-100 transition-all">Xóa</button>
                                     </div>
                                 )}
@@ -358,7 +358,7 @@ const AdminBlogEditor: React.FC = () => {
                                         <span>5 min read</span>
                                     </div>
                                 </div>
-                                {image && <img src={image.startsWith('http') ? image : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${image}`} className="w-full h-40 object-cover rounded-3xl mb-8 shadow-md" alt="Preview" />}
+                                {image && <img src={image.startsWith('http') ? image : `${api.baseUrl}${image}`} className="w-full h-40 object-cover rounded-3xl mb-8 shadow-md" alt="Preview" />}
                                 <div className="space-y-6">
                                     {blocks.map((b, i) => (
                                         <div key={i}>
@@ -378,7 +378,13 @@ const AdminBlogEditor: React.FC = () => {
                                             {b.type === 'product' && (
                                                 <div className="p-4 rounded-2xl bg-white border border-stone-100 flex gap-4 items-center">
                                                     <div className="w-12 h-12 bg-stone-100 rounded-lg overflow-hidden shrink-0">
-                                                        {b.productId && <img src={products.find(p => p.id === b.productId)?.image} className="w-full h-full object-cover" />}
+                                                        {b.productId && (
+                                                            <img
+                                                                src={products.find(p => p.id === b.productId)?.image?.startsWith('http') ? products.find(p => p.id === b.productId)?.image : `${api.baseUrl}${products.find(p => p.id === b.productId)?.image}`}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48?text=ERR'; }}
+                                                            />
+                                                        )}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="text-[10px] font-bold text-primary uppercase">Sản phẩm nhắc đến</p>
@@ -421,7 +427,12 @@ const AdminBlogEditor: React.FC = () => {
                                     }}
                                     className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-stone-50 transition-all text-left group"
                                 >
-                                    <div className="w-12 h-12 rounded-xl bg-stone-100 overflow-hidden ring-1 ring-stone-200"><img src={p.image} className="w-full h-full object-cover" /></div>
+                                    <div className="w-12 h-12 rounded-xl bg-stone-100 overflow-hidden ring-1 ring-stone-200">
+                                        <img
+                                            src={p.image?.startsWith('http') ? p.image : `${api.baseUrl}${p.image}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
                                     <span className="font-bold text-charcoal truncate flex-1 group-hover:text-primary transition-colors">{p.name}</span>
                                 </button>
                             ))}

@@ -510,7 +510,7 @@ const Checkout: React.FC = () => {
                                     <div key={item.product.id} className="flex gap-4">
                                         <div
                                             className="w-16 h-16 rounded-xl bg-white overflow-hidden flex-shrink-0 border border-primary/5 bg-cover bg-center"
-                                            style={{ backgroundImage: `url('${item.product.image}')` }}
+                                            style={{ backgroundImage: `url('${item.product.image?.startsWith('http') ? item.product.image : `${api.baseUrl}${item.product.image}`}')` }}
                                         />
                                         <div className="flex flex-col justify-center gap-1">
                                             <p className="text-primary font-bold text-sm leading-snug">{item.product.name}</p>

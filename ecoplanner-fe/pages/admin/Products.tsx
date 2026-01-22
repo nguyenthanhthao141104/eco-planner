@@ -211,7 +211,12 @@ const AdminProducts: React.FC = () => {
                   <div key={p.id} className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center rounded-2xl bg-white p-5 shadow-sm hover:shadow-md transition-all">
                      <div className="col-span-1 md:col-span-5 flex items-center gap-5">
                         <div className="h-16 w-16 rounded-xl bg-gray-100 overflow-hidden">
-                           <img src={p.image || 'https://via.placeholder.com/64'} className="w-full h-full object-cover" alt={p.name} />
+                           <img
+                              src={p.image?.startsWith('http') ? p.image : `${api.baseUrl}${p.image}`}
+                              className="w-full h-full object-cover"
+                              alt={p.name}
+                              onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/64?text=ERR'; }}
+                           />
                         </div>
                         <div>
                            <h3 className="text-lg font-bold text-[#1a2e24]">{p.name}</h3>
