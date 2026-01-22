@@ -20,9 +20,13 @@ RUN npx prisma generate
 COPY ecoplanner-be/src ./src
 COPY ecoplanner-be/prisma/seed.ts ./prisma/seed.ts
 COPY ecoplanner-be/tsconfig.json ./
+COPY ecoplanner-be/tsconfig.seed.json ./
 
-# Build TypeScript
+# Build TypeScript (main app)
 RUN npm run build
+
+# Build seed file separately
+RUN npx tsc -p tsconfig.seed.json
 
 # Production stage
 FROM node:20-alpine AS production
