@@ -457,7 +457,7 @@ const Checkout: React.FC = () => {
                                                 {settings.payment.qrCode && (
                                                     <div className="w-40 flex flex-col items-center gap-2">
                                                         <div className="w-full aspect-square bg-white p-2 rounded-2xl shadow-sm border border-primary/5 overflow-hidden">
-                                                            <img src={settings.payment.qrCode.startsWith('http') ? settings.payment.qrCode : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${settings.payment.qrCode}`} className="w-full h-full object-contain" alt="QR Code" />
+                                                            <img src={settings.payment.qrCode.startsWith('http') ? settings.payment.qrCode : `${api.baseUrl}${settings.payment.qrCode}`} className="w-full h-full object-contain" alt="QR Code" />
                                                         </div>
                                                         <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest text-center">Quét mã QR để thanh toán</span>
                                                     </div>

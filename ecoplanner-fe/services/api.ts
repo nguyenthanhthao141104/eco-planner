@@ -4,8 +4,9 @@ let rawBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').trim(
 // Clean up: remove all protocols and any /api occurrences to start from a clean slate
 rawBaseUrl = rawBaseUrl.replace(/^https?:\/\//g, '').replace(/\/api\/?/g, '');
 
-// Reconstruct correctly: Always https in production, no trailing /api (service calls add it)
-const API_BASE_URL = `https://${rawBaseUrl}`;
+// Reconstruct correctly: Use http for localhost, https for production
+const protocol = (rawBaseUrl.includes('localhost') || rawBaseUrl.includes('127.0.0.1')) ? 'http' : 'https';
+const API_BASE_URL = `${protocol}://${rawBaseUrl}`;
 
 console.log('📡 API Base URL sanitized:', API_BASE_URL);
 
@@ -14,7 +15,7 @@ interface RequestOptions extends RequestInit {
 }
 
 class ApiClient {
-    private baseUrl: string;
+    public readonly baseUrl: string;
 
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl;

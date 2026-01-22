@@ -3,7 +3,9 @@ import { io, Socket } from 'socket.io-client';
 let rawSocketUrl = (import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:3001').trim();
 // Clean up URL: remove protocols and trailing slashes
 rawSocketUrl = rawSocketUrl.replace(/^https?:\/\//g, '').replace(/\/api\/?/g, '').replace(/\/$/, '');
-const SOCKET_URL = `https://${rawSocketUrl}`;
+// Reconstruct correctly: Use http for localhost, https for production
+const protocol = (rawSocketUrl.includes('localhost') || rawSocketUrl.includes('127.0.0.1')) ? 'http' : 'https';
+const SOCKET_URL = `${protocol}://${rawSocketUrl}`;
 
 console.log('🔌 Socket URL sanitized:', SOCKET_URL);
 

@@ -233,7 +233,7 @@ const Settings: React.FC = () => {
                             <div className="flex gap-4 items-start">
                                 <div className="w-32 h-32 bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden border border-stone-200">
                                     {settings.payment.qrCode ? (
-                                        <img src={settings.payment.qrCode.startsWith('http') ? settings.payment.qrCode : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${settings.payment.qrCode}`} className="w-full h-full object-cover" />
+                                        <img src={settings.payment.qrCode.startsWith('http') ? settings.payment.qrCode : `${api.baseUrl}${settings.payment.qrCode}`} className="w-full h-full object-cover" />
                                     ) : (
                                         <CreditCard className="w-8 h-8 text-stone-300" />
                                     )}
