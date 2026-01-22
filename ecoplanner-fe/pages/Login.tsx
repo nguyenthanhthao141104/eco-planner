@@ -101,12 +101,6 @@ const Login: React.FC = () => {
                             Đăng ký ngay
                         </Link>
                     </div>
-
-                    <div className="mt-4 p-4 bg-stone-50 rounded-xl text-xs text-charcoal/60">
-                        <p className="font-semibold mb-1">Demo accounts:</p>
-                        <p>Admin: admin@gmail.com / admin123</p>
-                        <p>User: user@gmail.com / user123</p>
-                    </div>
                 </div>
             </div>
         </div>
