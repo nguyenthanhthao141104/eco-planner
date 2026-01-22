@@ -30,7 +30,22 @@ setupSocketHandlers(io);
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
-app.use(cors({ origin: config.frontendUrl, credentials: true }));
+const allowedOrigins = [config.frontendUrl];
+if (config.frontendUrl && !config.frontendUrl.startsWith('http')) {
+    allowedOrigins.push(`https://${config.frontendUrl}`);
+    allowedOrigins.push(`http://${config.frontendUrl}`);
+}
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.map(o => o.replace(/\/$/, '')).includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

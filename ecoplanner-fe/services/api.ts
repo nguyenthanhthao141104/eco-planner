@@ -1,5 +1,7 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const rawBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Strip trailing /api or /api/ to prevent /api/api double prefixing
+const API_BASE_URL = rawBaseUrl.replace(/\/api\/?$/, '');
 
 interface RequestOptions extends RequestInit {
     skipAuth?: boolean;
