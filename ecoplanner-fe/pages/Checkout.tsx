@@ -407,17 +407,17 @@ const Checkout: React.FC = () => {
                                                 <div className="flex-1 w-full space-y-4">
                                                     <div className="flex justify-between items-center text-sm">
                                                         <span className="text-primary/60">Ngân hàng</span>
-                                                        <span className="text-primary font-bold">{settings?.payment.bankName || 'Vietcombank'}</span>
+                                                        <span className="text-primary font-bold">{settings?.payment?.bankName || 'Vietcombank'}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-sm">
                                                         <span className="text-primary/60">Số tài khoản</span>
-                                                        <span className="text-primary font-bold">{settings?.payment.accountNumber || '1234567890'}</span>
+                                                        <span className="text-primary font-bold">{settings?.payment?.accountNumber || '1234567890'}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-sm">
                                                         <span className="text-primary/60">Chủ tài khoản</span>
-                                                        <span className="text-primary font-bold uppercase">{settings?.payment.accountHolder || 'NGUYEN VAN A'}</span>
+                                                        <span className="text-primary font-bold uppercase">{settings?.payment?.accountHolder || 'ECO PLANNER'}</span>
                                                     </div>
-                                                    {settings?.payment.branch && (
+                                                    {settings?.payment?.branch && (
                                                         <div className="flex justify-between items-center text-sm">
                                                             <span className="text-primary/60">Chi nhánh</span>
                                                             <span className="text-primary font-bold">{settings.payment.branch}</span>
@@ -430,7 +430,7 @@ const Checkout: React.FC = () => {
                                                 </div>
 
                                                 {/* QR Code */}
-                                                {settings?.payment.qrCode && (
+                                                {settings?.payment?.qrCode && (
                                                     <div className="w-40 flex flex-col items-center gap-2">
                                                         <div className="w-full aspect-square bg-white p-2 rounded-2xl shadow-sm border border-primary/5 overflow-hidden">
                                                             <img src={settings.payment.qrCode.startsWith('http') ? settings.payment.qrCode : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${settings.payment.qrCode}`} className="w-full h-full object-contain" alt="QR Code" />
@@ -443,7 +443,7 @@ const Checkout: React.FC = () => {
                                             <div className="p-4 bg-white border border-dashed border-primary/30 rounded-2xl">
                                                 <p className="text-xs text-primary/60 mb-1">Nội dung chuyển khoản:</p>
                                                 <p className="font-bold text-primary text-lg">
-                                                    {(settings?.payment.transferContent || "MEDE {orderId}").replace('{orderId}', '(Mã đơn của bạn)')}
+                                                    {(settings?.payment?.transferContent || "MEDE {orderId}").replace('{orderId}', '(Mã đơn của bạn)')}
                                                 </p>
                                             </div>
                                             <p className="text-[11px] text-primary/40 italic">Đơn hàng sẽ được xử lý ngay sau khi hệ thống ghi nhận giao dịch thành công.</p>
