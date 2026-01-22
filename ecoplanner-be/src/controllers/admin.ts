@@ -36,10 +36,14 @@ router.get('/dashboard', authMiddleware, adminMiddleware, async (req: Authentica
 // GET /api/admin/conversations - All conversations
 router.get('/conversations', authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res: Response) => {
     try {
+        const { preview } = req.query;
         const conversations = await prisma.conversation.findMany({
             include: {
                 user: { select: { id: true, name: true, email: true } },
-                messages: { orderBy: { createdAt: 'asc' } },
+                messages: {
+                    orderBy: { createdAt: preview === 'true' ? 'desc' : 'asc' },
+                    ...(preview === 'true' ? { take: 1 } : {})
+                },
             },
             orderBy: { updatedAt: 'desc' },
         });

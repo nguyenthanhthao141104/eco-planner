@@ -352,6 +352,77 @@ async function main() {
 
     console.log(`✅ Created sample conversation`);
 
+    // ============ BLOG POSTS ============
+    const blosPosts = await Promise.all([
+        prisma.blogPost.create({
+            data: {
+                title: 'Finding Peace in Daily Planning',
+                slug: 'finding-peace-in-daily-planning',
+                content: [
+                    { type: 'text', content: 'Tại sao việc viết ra kế hoạch mỗi sáng lại giúp bạn giảm bớt lo âu? Khám phá 3 phương pháp journaling giúp bạn giữ tâm trí bình thản giữa bộn bề công việc.' },
+                    { type: 'quote', content: 'Lập kế hoạch không phải là kiểm soát tương lai, mà là giúp bạn hiện diện trọn vẹn trong hiện tại.', styles: { backgroundColor: '#fdf6e3', fontFamily: 'serif' } },
+                    { type: 'text', content: 'Journaling không chỉ là ghi chép, đó là cách bạn đối thoại với chính mình. Hãy bắt đầu bằng những dòng đơn giản nhất.' }
+                ],
+                excerpt: 'Tại sao việc viết ra kế hoạch mỗi sáng lại giúp bạn giảm bớt lo âu? Khám phá 3 phương pháp...',
+                image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800',
+                type: 'ARTICLE',
+                tags: ['Sống chậm', 'Journaling'],
+                relatedProductIds: [products[0].id, products[7].id],
+            },
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Less but better. Đơn giản hóa cuộc sống không phải là vứt bỏ đồ đạc.',
+                slug: 'less-but-better',
+                content: [
+                    { type: 'quote', content: 'Less but better. Đơn giản hóa cuộc sống không phải là vứt bỏ đồ đạc.', styles: { backgroundColor: '#f3f4f6', fontFamily: 'serif' } }
+                ],
+                type: 'QUOTE',
+                tags: ['Sống chậm'],
+                createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            },
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Sustainable Stationery Choices for 2024',
+                slug: 'sustainable-stationery-choices-2024',
+                content: [
+                    { type: 'text', content: 'Khám phá những lựa chọn văn phòng phẩm thân thiện với môi trường, từ giấy tái chế đến bút có thể nạp lại mực...' },
+                    { type: 'product', content: 'Sổ tay tái chế Eco-Green', productId: products[7].id }
+                ],
+                image: 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?q=80&w=800',
+                type: 'ARTICLE',
+                tags: ['Bảo vệ môi trường'],
+                relatedProductIds: [products[7].id, products[2].id],
+            },
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Pomodoro không chỉ để làm việc.',
+                slug: 'pomodoro-not-just-for-work',
+                content: [
+                    { type: 'tip', content: 'Hãy thử dùng 25 phút tập trung để dọn dẹp, đọc sách, hoặc thậm chí là... không làm gì cả.', styles: { backgroundColor: '#e28d68' } }
+                ],
+                type: 'TIP',
+                tags: ['Mẹo lập kế hoạch'],
+            },
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Ep 12: Digital Minimalism với Cal Newport',
+                slug: 'ep-12-digital-minimalism',
+                content: [
+                    { type: 'podcast', content: 'Trong tập podcast này, chúng ta sẽ thảo luận về việc tối giản hóa sự hiện diện kỹ thuật số...' }
+                ],
+                type: 'PODCAST',
+                tags: ['Sống chậm'],
+                relatedProductIds: [products[0].id],
+            },
+        }),
+    ]);
+
+    console.log(`✅ Created ${blosPosts.length} blog posts`);
+
     console.log('🎉 Seeding completed!');
 }
 

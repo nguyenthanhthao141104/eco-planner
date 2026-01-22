@@ -1,28 +1,135 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShieldCheck, Loader2, CreditCard, Truck, Landmark } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
-import { api, ShippingAddress } from '../services/api';
+import { api, ShippingAddress, SystemSettings } from '../services/api';
 
-type PaymentMethod = 'MOMO' | 'VNPAY' | 'COD' | 'BANK';
+type PaymentMethod = 'VNPAY' | 'COD' | 'BANK';
+
+interface Location {
+    code: number;
+    name: string;
+}
 
 const Checkout: React.FC = () => {
     const navigate = useNavigate();
     const { items, totalPrice, clearCart } = useCart();
     const { user, isAuthenticated } = useAuth();
     const [step, setStep] = useState(1);
+    const [settings, setSettings] = useState<SystemSettings | null>(null);
     const [formData, setFormData] = useState<ShippingAddress>({
-        name: user?.name || '',
+        name: '',
         phone: '',
         address: '',
         city: '',
         district: '',
         ward: '',
     });
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MOMO');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('VNPAY');
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState('');
+
+    // Administrative data state
+    const [provinces, setProvinces] = useState<Location[]>([]);
+    const [districts, setDistricts] = useState<Location[]>([]);
+    const [wards, setWards] = useState<Location[]>([]);
+    const [loadingLocations, setLoadingLocations] = useState({
+        provinces: false,
+        districts: false,
+        wards: false
+    });
+
+    // Auto-populate form with user profile data
+    useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || prev.name,
+                phone: user.phone || prev.phone,
+                address: user.address || prev.address,
+                city: user.city || prev.city,
+                district: user.district || prev.district,
+                ward: user.ward || prev.ward,
+            }));
+        }
+    }, [user]);
+
+    // Fetch Regions on mount
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const data = await api.getSettings();
+                setSettings(data);
+            } catch (err) {
+                console.error('Failed to fetch settings', err);
+            }
+        };
+        fetchSettings();
+
+        const fetchProvinces = async () => {
+            setLoadingLocations(prev => ({ ...prev, provinces: true }));
+            try {
+                const response = await fetch('https://provinces.open-api.vn/api/p/');
+                const data = await response.json();
+                setProvinces(data);
+            } catch (err) {
+                console.error('Failed to fetch provinces', err);
+            } finally {
+                setLoadingLocations(prev => ({ ...prev, provinces: false }));
+            }
+        };
+        fetchProvinces();
+    }, []);
+
+    // Fetch Districts when city changes
+    useEffect(() => {
+        const province = provinces.find(p => p.name === formData.city);
+        if (!province) {
+            setDistricts([]);
+            setWards([]);
+            return;
+        }
+
+        const fetchDistricts = async () => {
+            setLoadingLocations(prev => ({ ...prev, districts: true }));
+            try {
+                const response = await fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`);
+                const data = await response.json();
+                setDistricts(data.districts || []);
+                // Don't reset district/ward if they exist (from user profile)
+            } catch (err) {
+                console.error('Failed to fetch districts', err);
+            } finally {
+                setLoadingLocations(prev => ({ ...prev, districts: false }));
+            }
+        };
+        fetchDistricts();
+    }, [formData.city, provinces]);
+
+    // Fetch Wards when district changes
+    useEffect(() => {
+        const district = districts.find(d => d.name === formData.district);
+        if (!district) {
+            setWards([]);
+            return;
+        }
+
+        const fetchWards = async () => {
+            setLoadingLocations(prev => ({ ...prev, wards: true }));
+            try {
+                const response = await fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`);
+                const data = await response.json();
+                setWards(data.wards || []);
+                // Don't reset ward if it exists (from user profile)
+            } catch (err) {
+                console.error('Failed to fetch wards', err);
+            } finally {
+                setLoadingLocations(prev => ({ ...prev, wards: false }));
+            }
+        };
+        fetchWards();
+    }, [formData.district, districts]);
 
     const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price) + 'đ';
 
@@ -84,14 +191,7 @@ const Checkout: React.FC = () => {
             const { order } = await api.createOrder(orderData);
 
             // Step 2: Process payment based on method
-            if (paymentMethod === 'MOMO') {
-                const result = await api.createMomoPayment(order.id);
-                if (result.payUrl) {
-                    clearCart();
-                    window.location.href = result.payUrl;
-                    return;
-                }
-            } else if (paymentMethod === 'VNPAY') {
+            if (paymentMethod === 'VNPAY') {
                 const result = await api.createVnpayPayment(order.id);
                 if (result.payUrl) {
                     clearCart();
@@ -195,12 +295,13 @@ const Checkout: React.FC = () => {
                                                     value={formData.city}
                                                     onChange={handleInputChange}
                                                     required
-                                                    className="w-full rounded-2xl p-4 text-primary text-base h-14 bg-cream border border-transparent focus:border-primary focus:outline-none"
+                                                    className="w-full rounded-2xl p-4 text-primary text-base h-14 bg-cream border border-transparent focus:border-primary focus:outline-none appearance-none"
+                                                    disabled={loadingLocations.provinces}
                                                 >
-                                                    <option value="">Chọn tỉnh thành</option>
-                                                    <option value="hcm">TP. Hồ Chí Minh</option>
-                                                    <option value="hn">Hà Nội</option>
-                                                    <option value="dn">Đà Nẵng</option>
+                                                    <option value="">{loadingLocations.provinces ? 'Đang tải...' : 'Chọn tỉnh thành'}</option>
+                                                    {provinces.map(p => (
+                                                        <option key={p.code} value={p.name}>{p.name}</option>
+                                                    ))}
                                                 </select>
                                             </div>
                                             <div className="flex flex-col gap-2">
@@ -209,9 +310,15 @@ const Checkout: React.FC = () => {
                                                     name="district"
                                                     value={formData.district}
                                                     onChange={handleInputChange}
-                                                    className="w-full rounded-2xl p-4 text-primary text-base h-14 bg-cream border border-transparent focus:border-primary focus:outline-none"
+                                                    className="w-full rounded-2xl p-4 text-primary text-base h-14 bg-cream border border-transparent focus:border-primary focus:outline-none appearance-none"
+                                                    disabled={!formData.city || loadingLocations.districts}
                                                 >
-                                                    <option value="">Chọn quận huyện</option>
+                                                    <option value="">
+                                                        {!formData.city ? 'Chọn tỉnh trước' : loadingLocations.districts ? 'Đang tải...' : 'Chọn quận huyện'}
+                                                    </option>
+                                                    {districts.map(d => (
+                                                        <option key={d.code} value={d.name}>{d.name}</option>
+                                                    ))}
                                                 </select>
                                             </div>
                                             <div className="flex flex-col gap-2">
@@ -220,9 +327,15 @@ const Checkout: React.FC = () => {
                                                     name="ward"
                                                     value={formData.ward}
                                                     onChange={handleInputChange}
-                                                    className="w-full rounded-2xl p-4 text-primary text-base h-14 bg-cream border border-transparent focus:border-primary focus:outline-none"
+                                                    className="w-full rounded-2xl p-4 text-primary text-base h-14 bg-cream border border-transparent focus:border-primary focus:outline-none appearance-none"
+                                                    disabled={!formData.district || loadingLocations.wards}
                                                 >
-                                                    <option value="">Chọn phường xã</option>
+                                                    <option value="">
+                                                        {!formData.district ? 'Chọn huyện trước' : loadingLocations.wards ? 'Đang tải...' : 'Chọn phường xã'}
+                                                    </option>
+                                                    {wards.map(w => (
+                                                        <option key={w.code} value={w.name}>{w.name}</option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
@@ -245,53 +358,40 @@ const Checkout: React.FC = () => {
                                     <p className="text-primary/60 text-base">Chọn phương thức thanh toán phù hợp nhất.</p>
                                 </div>
 
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    {/* MoMo */}
-                                    <label className={`group relative flex flex-col items-center p-6 bg-white border-2 rounded-2xl shadow-sm cursor-pointer transition-all hover:shadow-md ${paymentMethod === 'MOMO' ? 'border-primary ring-2 ring-primary ring-offset-4' : 'border-stone-200'}`}>
-                                        <input type="radio" name="payment" className="hidden" checked={paymentMethod === 'MOMO'} onChange={() => setPaymentMethod('MOMO')} />
-                                        <div className="w-16 h-16 mb-4 rounded-xl flex items-center justify-center bg-pink-100">
-                                            <span className="text-3xl">📱</span>
-                                        </div>
-                                        <h3 className="font-bold text-base mb-1">MoMo</h3>
-                                        <p className="text-xs text-center text-stone-500">Ví điện tử</p>
-                                    </label>
-
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                                     {/* VNPAY */}
-                                    <label className={`group relative flex flex-col items-center p-6 bg-white border-2 rounded-2xl shadow-sm cursor-pointer transition-all hover:shadow-md ${paymentMethod === 'VNPAY' ? 'border-primary ring-2 ring-primary ring-offset-4' : 'border-stone-200'}`}>
+                                    <label className={`group relative flex flex-col items-center justify-center p-8 bg-white border-2 rounded-2xl shadow-sm cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 min-h-[160px] ${paymentMethod === 'VNPAY' ? 'border-primary ring-2 ring-primary/20 shadow-md' : 'border-stone-100'}`}>
                                         <input type="radio" name="payment" className="hidden" checked={paymentMethod === 'VNPAY'} onChange={() => setPaymentMethod('VNPAY')} />
-                                        <div className="w-16 h-16 mb-4 rounded-xl flex items-center justify-center bg-blue-100">
-                                            <span className="text-3xl">💳</span>
+                                        <div className={`w-16 h-16 mb-4 rounded-2xl flex items-center justify-center transition-all ${paymentMethod === 'VNPAY' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-primary/5 text-primary'}`}>
+                                            <CreditCard className="w-8 h-8" />
                                         </div>
-                                        <h3 className="font-bold text-base mb-1">VNPay</h3>
-                                        <p className="text-xs text-center text-stone-500">ATM / Visa / QR</p>
+                                        <h3 className="font-bold text-lg mb-1.5 text-primary">VNPay</h3>
+                                        <p className="text-[10px] uppercase tracking-wider font-bold text-primary/40 text-center">Thẻ & QR Code</p>
                                     </label>
 
                                     {/* COD */}
-                                    <label className={`group relative flex flex-col items-center p-6 bg-white border-2 rounded-2xl shadow-sm cursor-pointer transition-all hover:shadow-md ${paymentMethod === 'COD' ? 'border-primary ring-2 ring-primary ring-offset-4' : 'border-stone-200'}`}>
+                                    <label className={`group relative flex flex-col items-center justify-center p-8 bg-white border-2 rounded-2xl shadow-sm cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 min-h-[160px] ${paymentMethod === 'COD' ? 'border-primary ring-2 ring-primary/20 shadow-md' : 'border-stone-100'}`}>
                                         <input type="radio" name="payment" className="hidden" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} />
-                                        <div className="w-16 h-16 mb-4 rounded-xl flex items-center justify-center bg-orange-100">
-                                            <span className="text-3xl">🚚</span>
+                                        <div className={`w-16 h-16 mb-4 rounded-2xl flex items-center justify-center transition-all ${paymentMethod === 'COD' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-primary/5 text-primary'}`}>
+                                            <Truck className="w-8 h-8" />
                                         </div>
-                                        <h3 className="font-bold text-base mb-1">COD</h3>
-                                        <p className="text-xs text-center text-stone-500">Thanh toán khi nhận</p>
+                                        <h3 className="font-bold text-lg mb-1.5 text-primary">COD</h3>
+                                        <p className="text-[10px] uppercase tracking-wider font-bold text-primary/40 text-center">Khi nhận hàng</p>
                                     </label>
 
                                     {/* Bank Transfer */}
-                                    <label className={`group relative flex flex-col items-center p-6 bg-white border-2 rounded-2xl shadow-sm cursor-pointer transition-all hover:shadow-md ${paymentMethod === 'BANK' ? 'border-primary ring-2 ring-primary ring-offset-4' : 'border-stone-200'}`}>
+                                    <label className={`group relative flex flex-col items-center justify-center p-8 bg-white border-2 rounded-2xl shadow-sm cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 min-h-[160px] ${paymentMethod === 'BANK' ? 'border-primary ring-2 ring-primary/20 shadow-md' : 'border-stone-100'}`}>
                                         <input type="radio" name="payment" className="hidden" checked={paymentMethod === 'BANK'} onChange={() => setPaymentMethod('BANK')} />
-                                        <div className="w-16 h-16 mb-4 rounded-xl flex items-center justify-center bg-green-100">
-                                            <span className="text-3xl">🏦</span>
+                                        <div className={`w-16 h-16 mb-4 rounded-2xl flex items-center justify-center transition-all ${paymentMethod === 'BANK' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-primary/5 text-primary'}`}>
+                                            <Landmark className="w-8 h-8" />
                                         </div>
-                                        <h3 className="font-bold text-base mb-1">Chuyển khoản</h3>
-                                        <p className="text-xs text-center text-stone-500">Banking</p>
+                                        <h3 className="font-bold text-lg mb-1.5 text-primary">Chuyển khoản</h3>
+                                        <p className="text-[10px] uppercase tracking-wider font-bold text-primary/40 text-center">Ngân hàng</p>
                                     </label>
                                 </div>
 
                                 {/* Payment Info */}
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
-                                    {paymentMethod === 'MOMO' && (
-                                        <p className="text-stone-600">Bạn sẽ được chuyển đến trang thanh toán MoMo. Sau khi thanh toán thành công, đơn hàng sẽ được xác nhận tự động.</p>
-                                    )}
                                     {paymentMethod === 'VNPAY' && (
                                         <p className="text-stone-600">Bạn sẽ được chuyển đến trang thanh toán VNPay. Hỗ trợ ATM nội địa, Visa/Mastercard và QR Code.</p>
                                     )}
@@ -299,14 +399,54 @@ const Checkout: React.FC = () => {
                                         <p className="text-stone-600">Thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đúng số tiền <strong>{formatPrice(finalTotal)}</strong>.</p>
                                     )}
                                     {paymentMethod === 'BANK' && (
-                                        <div className="space-y-2">
-                                            <p className="text-stone-600">Chuyển khoản đến tài khoản:</p>
-                                            <div className="bg-stone-50 p-4 rounded-xl text-sm space-y-1">
-                                                <p><strong>Ngân hàng:</strong> Vietcombank</p>
-                                                <p><strong>Số TK:</strong> 1234567890</p>
-                                                <p><strong>Chủ TK:</strong> MEDE STORE</p>
-                                                <p><strong>Số tiền:</strong> {formatPrice(finalTotal)}</p>
+                                        <div className="space-y-6">
+                                            <p className="text-stone-600">Vui lòng chuyển khoản chính xác số tiền sau:</p>
+
+                                            <div className="flex flex-col md:flex-row gap-8 items-center bg-primary/5 p-6 rounded-3xl border border-primary/10">
+                                                {/* Details */}
+                                                <div className="flex-1 w-full space-y-4">
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-primary/60">Ngân hàng</span>
+                                                        <span className="text-primary font-bold">{settings?.payment.bankName || 'Vietcombank'}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-primary/60">Số tài khoản</span>
+                                                        <span className="text-primary font-bold">{settings?.payment.accountNumber || '1234567890'}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-primary/60">Chủ tài khoản</span>
+                                                        <span className="text-primary font-bold uppercase">{settings?.payment.accountHolder || 'NGUYEN VAN A'}</span>
+                                                    </div>
+                                                    {settings?.payment.branch && (
+                                                        <div className="flex justify-between items-center text-sm">
+                                                            <span className="text-primary/60">Chi nhánh</span>
+                                                            <span className="text-primary font-bold">{settings.payment.branch}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex justify-between items-center pt-3 border-t border-primary/10">
+                                                        <span className="text-primary/60 font-bold">Số tiền</span>
+                                                        <span className="text-primary text-xl font-black">{formatPrice(finalTotal)}</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* QR Code */}
+                                                {settings?.payment.qrCode && (
+                                                    <div className="w-40 flex flex-col items-center gap-2">
+                                                        <div className="w-full aspect-square bg-white p-2 rounded-2xl shadow-sm border border-primary/5 overflow-hidden">
+                                                            <img src={settings.payment.qrCode.startsWith('http') ? settings.payment.qrCode : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${settings.payment.qrCode}`} className="w-full h-full object-contain" alt="QR Code" />
+                                                        </div>
+                                                        <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest text-center">Quét mã QR để thanh toán</span>
+                                                    </div>
+                                                )}
                                             </div>
+
+                                            <div className="p-4 bg-white border border-dashed border-primary/30 rounded-2xl">
+                                                <p className="text-xs text-primary/60 mb-1">Nội dung chuyển khoản:</p>
+                                                <p className="font-bold text-primary text-lg">
+                                                    {(settings?.payment.transferContent || "MEDE {orderId}").replace('{orderId}', '(Mã đơn của bạn)')}
+                                                </p>
+                                            </div>
+                                            <p className="text-[11px] text-primary/40 italic">Đơn hàng sẽ được xử lý ngay sau khi hệ thống ghi nhận giao dịch thành công.</p>
                                         </div>
                                     )}
                                 </div>
@@ -366,10 +506,6 @@ const Checkout: React.FC = () => {
                                 <div className="flex justify-between items-center text-sm font-medium">
                                     <span className="text-primary/60">Phí vận chuyển</span>
                                     <span className="text-primary">{shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee)}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-sm font-medium">
-                                    <span className="text-primary/60">Giảm giá</span>
-                                    <span className="text-green-600">-{formatPrice(discount)}</span>
                                 </div>
                             </div>
 

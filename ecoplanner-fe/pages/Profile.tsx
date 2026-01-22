@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, LogOut, ShoppingBag, MessageCircle, Settings, Loader2 } from 'lucide-react';
+import { User, Mail, LogOut, ShoppingBag, Settings, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Profile: React.FC = () => {
@@ -53,8 +53,8 @@ const Profile: React.FC = () => {
                                 <Mail className="w-4 h-4" /> {user.email}
                             </p>
                             <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold ${user.role === 'ADMIN' ? 'bg-red-100 text-red-600' :
-                                    user.role === 'SUPPORT' ? 'bg-blue-100 text-blue-600' :
-                                        'bg-green-100 text-green-600'
+                                user.role === 'SUPPORT' ? 'bg-blue-100 text-blue-600' :
+                                    'bg-green-100 text-green-600'
                                 }`}>
                                 {user.role === 'ADMIN' ? 'Quản trị viên' : user.role === 'SUPPORT' ? 'Hỗ trợ' : 'Khách hàng'}
                             </span>
@@ -74,13 +74,13 @@ const Profile: React.FC = () => {
                         </div>
                     </Link>
 
-                    <Link to="/chat" className="flex items-center gap-4 p-6 hover:bg-stone-50 transition-colors">
+                    <Link to="/settings" className="flex items-center gap-4 p-6 hover:bg-stone-50 transition-colors">
                         <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
-                            <MessageCircle className="w-6 h-6 text-secondary" />
+                            <Settings className="w-6 h-6 text-secondary" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-charcoal">Tin nhắn hỗ trợ</h3>
-                            <p className="text-sm text-charcoal/60">Chat với AI hoặc nhân viên</p>
+                            <h3 className="font-bold text-charcoal">Cài đặt</h3>
+                            <p className="text-sm text-charcoal/60">Cập nhật thông tin cá nhân</p>
                         </div>
                     </Link>
 

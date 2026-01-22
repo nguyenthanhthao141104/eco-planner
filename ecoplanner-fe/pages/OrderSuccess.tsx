@@ -37,19 +37,19 @@ const OrderSuccess: React.FC = () => {
                             <p className="text-sm text-charcoal/60">Mã đơn hàng</p>
                             <p className="font-bold text-primary text-lg">{orderNumber}</p>
                         </div>
-                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">
-                            Đã xác nhận
+                        <div className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-bold">
+                            Đang chờ xử lý
                         </div>
                     </div>
 
                     {/* Timeline */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                <CheckCircle className="w-5 h-5 text-green-600" />
+                            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                                <CheckCircle className="w-5 h-5 text-yellow-600" />
                             </div>
                             <div>
-                                <p className="font-bold text-charcoal">Đơn hàng đã được xác nhận</p>
+                                <p className="font-bold text-charcoal">Đơn hàng đang chờ xử lý</p>
                                 <p className="text-sm text-charcoal/60">Vừa xong</p>
                             </div>
                         </div>

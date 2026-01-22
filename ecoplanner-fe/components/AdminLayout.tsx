@@ -29,6 +29,10 @@ const AdminLayout: React.FC = () => {
             <Box className="w-5 h-5" />
             <span>Sản phẩm</span>
           </NavLink>
+          <NavLink to="/admin/blog" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${isActive ? 'bg-[#9CAF88] text-[#1a2e24] font-bold shadow-lg' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>
+            <Leaf className="w-5 h-5" />
+            <span>Góc Yên Tĩnh</span>
+          </NavLink>
           <NavLink to="/admin/orders" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${isActive ? 'bg-[#9CAF88] text-[#1a2e24] font-bold shadow-lg' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>
             <ShoppingBag className="w-5 h-5" />
             <span>Đơn hàng</span>
@@ -45,10 +49,10 @@ const AdminLayout: React.FC = () => {
           </NavLink>
 
           <div className="pt-8 pb-2 px-4 text-xs font-bold text-white/30 uppercase tracking-widest">Settings</div>
-          <div className="px-4 py-3 text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-3 rounded-2xl cursor-pointer">
+          <NavLink to="/admin/settings" className={({ isActive }) => `px-4 py-3 flex items-center gap-3 rounded-2xl cursor-pointer transition-all ${isActive ? 'bg-[#9CAF88] text-[#1a2e24] font-bold shadow-lg' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>
             <Settings className="w-5 h-5" />
             <span>Cài đặt</span>
-          </div>
+          </NavLink>
           <Link to="/" className="px-4 py-3 text-white/70 hover:bg-white/5 hover:text-red-300 flex items-center gap-3 rounded-2xl cursor-pointer mt-auto">
             <LogOut className="w-5 h-5" />
             <span>Thoát</span>

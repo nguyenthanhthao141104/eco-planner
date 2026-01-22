@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, Plus, TrendingUp, ShoppingBag, MessageSquare, Loader2, Package } from 'lucide-react';
 import { api, Product } from '../../services/api';
 
@@ -18,6 +19,7 @@ interface Conversation {
 }
 
 const AdminDashboard: React.FC = () => {
+   const navigate = useNavigate();
    const [stats, setStats] = useState<DashboardStats | null>(null);
    const [products, setProducts] = useState<Product[]>([]);
    const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -56,7 +58,7 @@ const AdminDashboard: React.FC = () => {
 
          // Load conversations
          try {
-            const convData = await api.getConversations();
+            const convData = await api.getConversations(true);
             setConversations(convData.slice(0, 5));
          } catch {
             setConversations([]);
@@ -200,13 +202,13 @@ const AdminDashboard: React.FC = () => {
             <div className="lg:col-span-6 flex flex-col rounded-2xl bg-white p-6 shadow-sm border border-white/50">
                <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-bold text-[#2C4C3B] font-display flex items-center gap-2"><MessageSquare className="w-5 h-5 text-[#9CAF88]" /> Tin nhắn mới</h3>
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#CB8B78] text-[10px] font-bold text-white">{conversations.length}</div>
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#CB8B78] text-[10px] font-bold text-white">{stats?.pendingChats || 0}</div>
                </div>
                <div className="flex flex-col gap-4">
                   {conversations.length === 0 ? (
                      <p className="text-sm text-[#667f71] text-center py-4">Chưa có tin nhắn nào</p>
                   ) : conversations.map((conv) => (
-                     <div key={conv.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#F9F9F5] cursor-pointer">
+                     <div key={conv.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#F9F9F5] cursor-pointer" onClick={() => navigate('/admin/chat')}>
                         <div className="h-10 w-10 flex items-center justify-center rounded-full bg-[#E8F5E9] text-[#2C4C3B] font-bold">
                            {conv.user.name?.charAt(0) || conv.user.email.charAt(0).toUpperCase()}
                         </div>
@@ -216,10 +218,10 @@ const AdminDashboard: React.FC = () => {
                               <span className="text-xs text-[#667f71]">{formatTimeAgo(conv.updatedAt)}</span>
                            </div>
                            <p className="text-sm text-[#5D7365] line-clamp-1">
-                              {conv.messages[0]?.content || 'Cuộc hội thoại mới'}
+                              {conv.messages && conv.messages[0] ? conv.messages[0].content : 'Cuộc hội thoại mới'}
                            </p>
                         </div>
-                        {conv.status === 'ACTIVE' && <div className="h-2 w-2 rounded-full bg-[#CB8B78] mt-2"></div>}
+                        {conv.status !== 'RESOLVED' && <div className="h-2 w-2 rounded-full bg-[#CB8B78] mt-2"></div>}
                      </div>
                   ))}
                </div>

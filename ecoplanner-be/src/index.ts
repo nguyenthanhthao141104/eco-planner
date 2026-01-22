@@ -8,12 +8,16 @@ import { Server } from 'socket.io';
 import { config } from './config';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { setupSocketHandlers } from './socket/handlers';
+import path from 'path';
 import authRoutes from './controllers/auth';
 import productRoutes from './controllers/products';
 import chatRoutes from './controllers/chat';
 import adminRoutes from './controllers/admin';
 import orderRoutes from './controllers/orders';
 import paymentRoutes from './controllers/payment';
+import blogRoutes from './controllers/blogs';
+import uploadRoutes from './controllers/uploads';
+import settingsRoutes from './controllers/settings';
 
 const app = express();
 const httpServer = createServer(app);
@@ -23,10 +27,16 @@ const io = new Server(httpServer, {
 
 setupSocketHandlers(io);
 
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors({ origin: config.frontendUrl, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 app.use('/api/', rateLimit({ windowMs: config.rateLimit.windowMs, max: config.rateLimit.maxRequests, message: { error: 'Too many requests' } }));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
@@ -36,6 +46,9 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/blogs', blogRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/settings', settingsRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

@@ -1,0 +1,21 @@
+{
+  "branding": {
+    "facebook": "facebook.com/lvt17.xyz",
+    "instagram": "https://www.instagram.com/l.vt17_/",
+    "hotline": "1234567890"
+  },
+  "ai": {
+    "greeting": "Xin chào! Mình là MEDE-Assistant 🌿. Mình có thể giúp gì cho bạn hôm nay?"
+  },
+  "payment": {
+    "bankName": "TP Bank",
+    "accountNumber": "1234567890",
+    "accountHolder": "MEDE STORE",
+    "branch": "",
+    "qrCode": "/uploads/file-1769065802391-271880650.png",
+    "transferContent": "MEDE {orderId}"
+  },
+  "seo": {
+    "metaDescription": "MEDE - Tiệm văn phòng phẩm xanh bền vững. Chuyên sổ tay thủ công và quà tặng eco-friendly.\nSổ kế hoạch | Sổ planner | Văn phòng phẩm | vở | bút | kế hoạch | xanh | bảo vệ môi trường."
+  }
+}

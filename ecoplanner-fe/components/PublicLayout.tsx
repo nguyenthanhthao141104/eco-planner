@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, Leaf, Send, Sparkles, X, LogIn } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, Leaf, Send, Sparkles, X, LogIn, Instagram, Facebook, Phone } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../hooks/useChat';
+import { api, SystemSettings } from '../services/api';
 
 // Parse markdown bold (**text**) to HTML
 const parseMarkdown = (text: string) => {
@@ -13,9 +14,34 @@ const parseMarkdown = (text: string) => {
 const PublicLayout: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  const [settings, setSettings] = useState<SystemSettings | null>(null);
   const { totalItems } = useCart();
   const { user, isAuthenticated } = useAuth();
   const { messages, sendMessage, isLoading: chatLoading, error: chatError } = useChat();
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        console.log('Fetching system settings...');
+        const data = await api.getSettings();
+        console.log('System settings received:', data);
+        setSettings(data);
+        // Update SEO
+        if (data.seo && data.seo.metaDescription) {
+          let meta = document.querySelector('meta[name="description"]');
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.setAttribute('name', 'description');
+            document.head.appendChild(meta);
+          }
+          meta.setAttribute('content', data.seo.metaDescription);
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      }
+    };
+    loadSettings();
+  }, []);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,10 +132,33 @@ const PublicLayout: React.FC = () => {
             <Leaf className="w-6 h-6 text-primary" />
             <span className="font-bold font-display text-charcoal">MEDE</span>
           </div>
-          <p className="text-sm text-charcoal/60">© 2024 MEDE. Designed for balance.</p>
+          <p className="text-sm text-charcoal/60">© 2026 MEDE. Designed for balance.</p>
           <div className="flex gap-4">
-            <a href="#" className="text-charcoal/60 hover:text-primary transition-colors">Instagram</a>
-            <a href="#" className="text-charcoal/60 hover:text-primary transition-colors">Facebook</a>
+            {settings?.branding.instagram && (
+              <a
+                href={settings.branding.instagram.startsWith('http') ? settings.branding.instagram : `https://${settings.branding.instagram}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-charcoal/60 hover:text-primary transition-colors flex items-center gap-1"
+              >
+                <Instagram className="w-4 h-4" /> Instagram
+              </a>
+            )}
+            {settings?.branding.facebook && (
+              <a
+                href={settings.branding.facebook.startsWith('http') ? settings.branding.facebook : `https://${settings.branding.facebook}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-charcoal/60 hover:text-primary transition-colors flex items-center gap-1"
+              >
+                <Facebook className="w-4 h-4" /> Facebook
+              </a>
+            )}
+            {settings?.branding.hotline && (
+              <a href={`tel:${settings.branding.hotline}`} className="text-charcoal/60 hover:text-primary transition-colors flex items-center gap-1">
+                <Phone className="w-4 h-4" /> {settings.branding.hotline}
+              </a>
+            )}
           </div>
         </div>
       </footer>
@@ -153,7 +202,7 @@ const PublicLayout: React.FC = () => {
                     <Sparkles className="w-3 h-3 text-primary" />
                   </div>
                   <div className="bg-white p-3 rounded-2xl rounded-tl-sm text-sm shadow-sm border border-stone-100 text-charcoal/80">
-                    Xin chào! Mình là MEDE-Assistant 🌿. Bạn cần hỗ trợ gì về sản phẩm văn phòng phẩm thân thiện môi trường?
+                    {settings?.ai.greeting || "Xin chào! Mình là MEDE-Assistant 🌿. Bạn cần hỗ trợ gì về sản phẩm văn phòng phẩm thân thiện môi trường?"}
                   </div>
                 </div>
               ) : (

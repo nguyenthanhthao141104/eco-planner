@@ -16,7 +16,7 @@ class ApiClient {
         return localStorage.getItem('token');
     }
 
-    private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    public async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
         const { skipAuth = false, ...fetchOptions } = options;
         const headers: HeadersInit = { 'Content-Type': 'application/json', ...options.headers };
 
@@ -47,6 +47,17 @@ class ApiClient {
     }
 
     async getMe() { return this.request<User>('/api/auth/me'); }
+
+    async updateProfile(data: Partial<Pick<User, 'name' | 'phone' | 'address' | 'city' | 'district' | 'ward'>>) {
+        return this.request<User>('/api/auth/profile', { method: 'PATCH', body: JSON.stringify(data) });
+    }
+
+    async updatePassword(currentPassword: string, newPassword: string) {
+        return this.request<{ message: string }>('/api/auth/password', {
+            method: 'PATCH',
+            body: JSON.stringify({ currentPassword, newPassword }),
+        });
+    }
 
     // Products
     async getProducts(params?: { tag?: string; search?: string }) {
@@ -89,7 +100,9 @@ class ApiClient {
 
     // Admin
     async getDashboard() { return this.request<DashboardStats>('/api/admin/dashboard'); }
-    async getConversations() { return this.request<Conversation[]>('/api/admin/conversations'); }
+    async getConversations(preview = false) {
+        return this.request<Conversation[]>(`/api/admin/conversations${preview ? '?preview=true' : ''}`);
+    }
     async getInventory() { return this.request<InventoryStats>('/api/admin/inventory'); }
 
     // Admin Orders
@@ -130,11 +143,55 @@ class ApiClient {
     async confirmCodOrder(orderId: string) {
         return this.request<{ success: boolean; orderId: string }>('/api/payment/cod', { method: 'POST', body: JSON.stringify({ orderId }) });
     }
+
+    // Blogs
+    async getBlogs(params?: { type?: string; tag?: string }) {
+        const query = new URLSearchParams();
+        if (params?.type) query.append('type', params.type);
+        if (params?.tag) query.append('tag', params.tag);
+        return this.request<BlogPost[]>(`/api/blogs?${query.toString()}`);
+    }
+
+    async getBlogBySlug(slug: string) {
+        return this.request<BlogPost & { relatedProducts: Product[] }>(`/api/blogs/${slug}`);
+    }
+
+    async uploadFile(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const token = this.getToken();
+        const headers: HeadersInit = {};
+        if (token) (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${this.baseUrl}/api/upload`, {
+            method: 'POST',
+            body: formData,
+            headers
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+            throw new Error(error.error || `HTTP error ${response.status}`);
+        }
+        return response.json() as Promise<{ url: string }>;
+    }
+
+    // Settings
+    async getSettings() {
+        return this.request<SystemSettings>('/api/settings', { skipAuth: true });
+    }
+
+    async updateSettings(data: Partial<SystemSettings>) {
+        return this.request<SystemSettings>('/api/settings', { method: 'PATCH', body: JSON.stringify(data) });
+    }
 }
 
 // Types
 export interface User {
-    id: string; email: string; name: string; role: 'CUSTOMER' | 'ADMIN' | 'SUPPORT'; preferences?: Record<string, unknown>;
+    id: string; email: string; name: string; role: 'CUSTOMER' | 'ADMIN' | 'SUPPORT';
+    phone?: string; address?: string; city?: string; district?: string; ward?: string;
+    preferences?: Record<string, unknown>;
 }
 
 export interface Product {
@@ -197,6 +254,53 @@ export interface UserOrder {
     id: string; userId: string; status: OrderStatus; total: number; note?: string;
     createdAt: string; updatedAt: string;
     items: OrderItem[];
+}
+
+export interface BlogBlock {
+    type: 'text' | 'quote' | 'tip' | 'podcast' | 'product';
+    content: string;
+    styles?: {
+        backgroundColor?: string;
+        fontFamily?: 'serif' | 'sans';
+        accentColor?: string;
+        icon?: string;
+    };
+    productId?: string;
+}
+
+export interface BlogPost {
+    id: string;
+    title: string;
+    slug: string;
+    content: BlogBlock[];
+    excerpt?: string;
+    image?: string;
+    type: 'ARTICLE' | 'QUOTE' | 'TIP' | 'PODCAST';
+    tags: string[];
+    relatedProductIds: string[];
+    createdAt: string;
+}
+
+export interface SystemSettings {
+    branding: {
+        facebook: string;
+        instagram: string;
+        hotline: string;
+    };
+    ai: {
+        greeting: string;
+    };
+    payment: {
+        bankName: string;
+        accountNumber: string;
+        accountHolder: string;
+        branch?: string;
+        qrCode?: string;
+        transferContent: string;
+    };
+    seo: {
+        metaDescription: string;
+    };
 }
 
 export const api = new ApiClient(API_BASE_URL);
