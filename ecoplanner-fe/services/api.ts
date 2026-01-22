@@ -1,4 +1,4 @@
-// API Configuration
+// API Configuration (Force redeploy at 21:10)
 let rawBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').trim();
 
 // Clean up: remove all protocols and any /api occurrences to start from a clean slate

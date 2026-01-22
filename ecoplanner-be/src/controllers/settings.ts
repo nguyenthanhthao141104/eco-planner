@@ -43,6 +43,10 @@ const readSettings = () => {
 // Helper to write settings
 const writeSettings = (settings: any) => {
     try {
+        const dir = path.dirname(SETTINGS_PATH);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
         fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2), 'utf8');
         return true;
     } catch (error) {
