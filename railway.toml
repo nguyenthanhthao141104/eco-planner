@@ -1,18 +1,9 @@
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
+dockerfilePath = "ecoplanner-be/Dockerfile"
 watchPatterns = ["ecoplanner-be/**"]
 
-[build.nixpacksPlan.phases.setup]
-nixPkgs = ["nodejs_20", "npm"]
-
-[build.nixpacksPlan.phases.install]
-cmds = ["cd ecoplanner-be && npm ci"]
-
-[build.nixpacksPlan.phases.build]
-cmds = ["cd ecoplanner-be && npx prisma generate && npm run build"]
-
 [deploy]
-startCommand = "cd ecoplanner-be && npx prisma migrate deploy && npm start"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
