@@ -146,7 +146,7 @@ const AdminDashboard: React.FC = () => {
                <div className="flex flex-col gap-3 overflow-y-auto flex-1">
                   {products.slice(0, 4).map((product, i) => (
                      <div key={product.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#F9F9F5]">
-                        <img src={product.image || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded-lg object-cover" alt={product.name} />
+                        <img src={product.image || 'https://placehold.co/40'} className="w-10 h-10 rounded-lg object-cover" alt={product.name} />
                         <div className="flex-1 min-w-0">
                            <p className="text-sm font-bold text-[#1a2e24] truncate">{product.name}</p>
                            <p className="text-xs text-[#667f71]">{formatCurrency(product.price)}</p>

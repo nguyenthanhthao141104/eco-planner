@@ -135,7 +135,7 @@ const AdminOrders: React.FC = () => {
                                 <div className="flex gap-2 mb-4">
                                     {order.items.slice(0, 4).map((item, i) => (
                                         <div key={i} className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden">
-                                            <img src={item.product.image || 'https://via.placeholder.com/48'} alt={item.product.name} className="w-full h-full object-cover" />
+                                            <img src={item.product.image || 'https://placehold.co/48'} alt={item.product.name} className="w-full h-full object-cover" />
                                         </div>
                                     ))}
                                     {order.items.length > 4 && (

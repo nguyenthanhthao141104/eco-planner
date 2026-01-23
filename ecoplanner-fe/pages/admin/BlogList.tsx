@@ -107,7 +107,7 @@ const AdminBlogList: React.FC = () => {
                                             src={post.image.startsWith('http') ? post.image : `${api.baseUrl}${post.image}`}
                                             className="w-full h-full object-cover"
                                             alt={post.title}
-                                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/96x64?text=ERR'; }}
+                                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/96x64?text=ERR'; }}
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-xs text-gray-400 font-bold uppercase">No Image</div>

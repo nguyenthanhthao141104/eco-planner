@@ -382,7 +382,7 @@ const AdminBlogEditor: React.FC = () => {
                                                             <img
                                                                 src={products.find(p => p.id === b.productId)?.image?.startsWith('http') ? products.find(p => p.id === b.productId)?.image : `${api.baseUrl}${products.find(p => p.id === b.productId)?.image}`}
                                                                 className="w-full h-full object-cover"
-                                                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48?text=ERR'; }}
+                                                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/48?text=ERR'; }}
                                                             />
                                                         )}
                                                     </div>

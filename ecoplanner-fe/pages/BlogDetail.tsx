@@ -59,7 +59,7 @@ const BlockRenderer: React.FC<{ block: BlogBlock, products?: Product[] }> = ({ b
                                 src={linkedProduct.image?.startsWith('http') ? linkedProduct.image : `${api.baseUrl}${linkedProduct.image}`}
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                 alt={linkedProduct.name}
-                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/128?text=ERR'; }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/128?text=ERR'; }}
                             />
                         </div>
                         <div className="flex-1">
@@ -159,7 +159,7 @@ const BlogDetail: React.FC = () => {
                             src={post.image.startsWith('http') ? post.image : `${api.baseUrl}${post.image}`}
                             className="w-full h-auto object-cover max-h-[600px]"
                             alt={post.title}
-                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/850x500?text=ERR'; }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/850x500?text=ERR'; }}
                         />
                     </div>
                 )}
@@ -187,7 +187,7 @@ const BlogDetail: React.FC = () => {
                                             src={product.image?.startsWith('http') ? product.image : `${api.baseUrl}${product.image}`}
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             alt={product.name}
-                                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=ERR'; }}
+                                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=ERR'; }}
                                         />
                                     </div>
                                     <h3 className="font-bold text-xl text-charcoal group-hover:text-primary transition-colors text-center">{product.name}</h3>

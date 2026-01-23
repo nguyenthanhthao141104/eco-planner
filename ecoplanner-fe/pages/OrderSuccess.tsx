@@ -1,16 +1,33 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { CheckCircle, Package, Truck, ArrowRight, Home, ShoppingBag } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { CheckCircle, Package, Truck, Home, ShoppingBag, CreditCard } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { api, SystemSettings, DEFAULT_SETTINGS } from '../services/api';
 
 const OrderSuccess: React.FC = () => {
     const { clearCart } = useCart();
-    const orderNumber = `ECO${Date.now().toString().slice(-8)}`;
+    const [searchParams] = useSearchParams();
+    const orderId = searchParams.get('orderId');
+    const paymentMethod = searchParams.get('method');
+    const [settings, setSettings] = useState<SystemSettings>(DEFAULT_SETTINGS);
 
     useEffect(() => {
         // Clear cart after successful order
         clearCart();
+
+        // Fetch settings for bank instructions if needed
+        const fetchSettings = async () => {
+            try {
+                const data = await api.getSettings();
+                setSettings(data);
+            } catch (err) {
+                console.error('Failed to fetch settings', err);
+            }
+        };
+        fetchSettings();
     }, []);
+
+    const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price) + 'đ';
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
@@ -30,12 +47,41 @@ const OrderSuccess: React.FC = () => {
                     Cảm ơn bạn đã mua sắm tại MEDE. Đơn hàng của bạn đang được xử lý.
                 </p>
 
+                {/* Bank Transfer Instructions for BANK method */}
+                {paymentMethod === 'BANK' && (
+                    <div className="mb-8 bg-primary/5 p-6 rounded-3xl border border-primary/20 text-left">
+                        <h2 className="font-bold text-primary mb-4 flex items-center gap-2">
+                            <CreditCard className="w-5 h-5" /> Hướng dẫn chuyển khoản
+                        </h2>
+                        <div className="space-y-3 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-primary/60">Ngân hàng:</span>
+                                <span className="text-primary font-bold">{settings.payment.bankName}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-primary/60">Số tài khoản:</span>
+                                <span className="text-primary font-bold">{settings.payment.accountNumber}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-primary/60">Chủ tài khoản:</span>
+                                <span className="text-primary font-bold uppercase">{settings.payment.accountHolder}</span>
+                            </div>
+                            <div className="pt-3 border-t border-primary/10">
+                                <p className="text-xs text-primary/60 mb-1">Nội dung chuyển khoản:</p>
+                                <p className="font-bold text-primary text-base bg-white p-3 rounded-xl border border-primary/10">
+                                    {settings.payment.transferContent.replace('{orderId}', orderId || '')}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Order Info Card */}
-                <div className="bg-cream rounded-2xl p-6 mb-8 text-left">
+                <div className="bg-cream rounded-2xl p-6 mb-8 text-left border border-stone-200">
                     <div className="flex items-center justify-between mb-4 pb-4 border-b border-primary/10">
                         <div>
                             <p className="text-sm text-charcoal/60">Mã đơn hàng</p>
-                            <p className="font-bold text-primary text-lg">{orderNumber}</p>
+                            <p className="font-bold text-primary text-lg">{orderId ? `#${orderId.slice(0, 8)}...` : '---'}</p>
                         </div>
                         <div className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-bold">
                             Đang chờ xử lý
@@ -78,13 +124,13 @@ const OrderSuccess: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
                         to="/"
-                        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-full transition-all"
+                        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-full transition-all shadow-lg shadow-primary/20"
                     >
                         <Home className="w-5 h-5" /> Về trang chủ
                     </Link>
                     <Link
                         to="/shop"
-                        className="flex items-center justify-center gap-2 bg-stone-100 hover:bg-stone-200 text-charcoal font-bold px-8 py-4 rounded-full transition-all"
+                        className="flex items-center justify-center gap-2 bg-white border border-stone-200 hover:bg-stone-50 text-charcoal font-bold px-8 py-4 rounded-full transition-all"
                     >
                         <ShoppingBag className="w-5 h-5" /> Tiếp tục mua sắm
                     </Link>
@@ -92,7 +138,7 @@ const OrderSuccess: React.FC = () => {
 
                 {/* Email Note */}
                 <p className="text-sm text-charcoal/50 mt-8">
-                    📧 Email xác nhận đã được gửi đến địa chỉ email của bạn
+                    📧 Email xác nhận sẽ được gửi đến địa chỉ của bạn.
                 </p>
             </div>
         </div>

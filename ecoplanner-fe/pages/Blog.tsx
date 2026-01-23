@@ -99,7 +99,7 @@ const Blog: React.FC = () => {
                            src={post.image.startsWith('http') ? post.image : `${api.baseUrl}${post.image}`}
                            className="h-64 w-full object-cover transition-transform duration-700 group-hover:scale-105"
                            alt={post.title}
-                           onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x250?text=ERR'; }}
+                           onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400x250?text=ERR'; }}
                         />
                      ) : (
                         <div className="h-64 w-full bg-stone-100 flex items-center justify-center text-stone-400">No Image</div>

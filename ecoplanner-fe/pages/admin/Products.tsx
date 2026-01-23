@@ -215,7 +215,7 @@ const AdminProducts: React.FC = () => {
                               src={p.image?.startsWith('http') ? p.image : `${api.baseUrl}${p.image}`}
                               className="w-full h-full object-cover"
                               alt={p.name}
-                              onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/64?text=ERR'; }}
+                              onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/64?text=ERR'; }}
                            />
                         </div>
                         <div>
@@ -347,7 +347,7 @@ const AdminProducts: React.FC = () => {
                                     alt="Preview"
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
-                                       (e.target as HTMLImageElement).src = 'https://via.placeholder.com/46?text=ERR';
+                                       (e.target as HTMLImageElement).src = 'https://placehold.co/46?text=ERR';
                                     }}
                                  />
                               </div>

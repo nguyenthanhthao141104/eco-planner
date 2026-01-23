@@ -128,6 +128,12 @@ model BlogPost {
   @@index([tags])
 }
 
+model SystemSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
 enum Role {
   CUSTOMER
   ADMIN
