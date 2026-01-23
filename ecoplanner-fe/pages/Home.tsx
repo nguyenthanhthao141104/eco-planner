@@ -25,9 +25,6 @@ const Home: React.FC = () => {
             <Link to="/shop" className="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-xl shadow-primary/20 flex items-center gap-2">
               Khám Phá Ngay <ArrowRight className="w-4 h-4" />
             </Link>
-            <button className="bg-white border border-stone-200 hover:border-primary/50 text-charcoal font-semibold px-8 py-4 rounded-full transition-all flex items-center gap-2">
-              <PlayCircle className="w-5 h-5 text-primary" /> Xem Video
-            </button>
           </div>
         </div>
         <div className="flex-1 relative group h-64 lg:h-auto">
