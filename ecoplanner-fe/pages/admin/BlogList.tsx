@@ -46,7 +46,7 @@ const AdminBlogList: React.FC = () => {
 
     const filteredPosts = posts.filter(p =>
         p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.tags.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()))
+        (Array.isArray(p.tags) && p.tags.some(t => t.toLowerCase().includes(searchTerm.toLowerCase())))
     );
 
     if (isLoading) {

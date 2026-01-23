@@ -158,7 +158,8 @@ class ApiClient {
         const query = new URLSearchParams();
         if (params?.type) query.append('type', params.type);
         if (params?.tag) query.append('tag', params.tag);
-        return this.request<BlogPost[]>(`/api/blogs?${query.toString()}`);
+        const qs = query.toString();
+        return this.request<BlogPost[]>(`/api/blogs${qs ? `?${qs}` : ''}`);
     }
 
     async getBlogBySlug(slug: string) {
