@@ -304,8 +304,10 @@ export interface UserOrder {
 }
 
 export interface BlogBlock {
-    type: 'text' | 'quote' | 'tip' | 'podcast' | 'product';
+    type: 'text' | 'quote' | 'tip' | 'podcast' | 'product' | 'image' | 'heading';
     content: string;
+    alt?: string;
+    caption?: string;
     styles?: {
         backgroundColor?: string;
         fontFamily?: 'serif' | 'sans';
@@ -325,6 +327,7 @@ export interface BlogPost {
     type: 'ARTICLE' | 'QUOTE' | 'TIP' | 'PODCAST';
     tags: string[];
     relatedProductIds: string[];
+    seoKeywords?: Record<string, string>;
     createdAt: string;
 }
 

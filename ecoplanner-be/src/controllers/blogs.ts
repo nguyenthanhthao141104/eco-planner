@@ -64,9 +64,9 @@ router.get('/id/:id', async (req: Request, res: Response) => {
 // Create blog post
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const { title, slug, content, excerpt, image, type, tags, relatedProductIds } = req.body;
+        const { title, slug, content, excerpt, image, type, tags, relatedProductIds, seoKeywords } = req.body;
         const post = await prisma.blogPost.create({
-            data: { title, slug, content, excerpt, image, type, tags, relatedProductIds },
+            data: { title, slug, content, excerpt, image, type, tags, relatedProductIds, seoKeywords },
         });
         res.status(201).json(post);
     } catch (error) {
@@ -79,10 +79,10 @@ router.post('/', async (req: Request, res: Response) => {
 router.patch('/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { title, slug, content, excerpt, image, type, tags, relatedProductIds } = req.body;
+        const { title, slug, content, excerpt, image, type, tags, relatedProductIds, seoKeywords } = req.body;
         const post = await prisma.blogPost.update({
             where: { id },
-            data: { title, slug, content, excerpt, image, type, tags, relatedProductIds },
+            data: { title, slug, content, excerpt, image, type, tags, relatedProductIds, seoKeywords },
         });
         res.json(post);
     } catch (error) {

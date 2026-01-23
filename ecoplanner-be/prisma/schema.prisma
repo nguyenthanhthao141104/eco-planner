@@ -120,6 +120,7 @@ model BlogPost {
   type              BlogType @default(ARTICLE)
   tags              String[]
   relatedProductIds String[]
+  seoKeywords       Json?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

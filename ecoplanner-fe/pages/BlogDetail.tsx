@@ -3,19 +3,80 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, ShoppingBag, Loader2, Play, Lightbulb } from 'lucide-react';
 import { api, BlogPost, Product, BlogBlock } from '../services/api';
 
-const BlockRenderer: React.FC<{ block: BlogBlock, products?: Product[] }> = ({ block, products }) => {
+const slugify = (text: string) => {
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[đĐ]/g, "d")
+        .replace(/([^0-9a-z-\s])/g, "")
+        .replace(/(\s+)/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-+|-+$/g, "");
+};
+
+const applyAutolinks = (text: string, keywords: Record<string, string>) => {
+    if (!keywords || Object.keys(keywords).length === 0) return text;
+
+    // Sort keywords by length descending to avoid short keywords breaking longer ones
+    const sortedKeys = Object.keys(keywords).sort((a, b) => b.length - a.length);
+
+    let result = text;
+    const usedRanges: { start: number, end: number }[] = [];
+
+    // Simple heuristic: only auto-link the first occurrence of each keyword
+    sortedKeys.forEach(keyword => {
+        if (!keyword) return;
+        const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+        let match;
+
+        // We handle this carefully to avoid linking inside already linked text
+        // For simplicity in React, we'll return a mix of string and JSX if needed, 
+        // but since we are rendering as text, we'll use dangerouslySetInnerHTML for the autolinked version
+        // if we want to support HTML. For now let's just do a string replacement with <a> tags
+        // and sanitize later if needed.
+
+        result = result.replace(regex, (m) => {
+            return `<a href="${keywords[keyword]}" class="text-primary font-bold hover:underline" target="_blank" rel="noopener noreferrer">${m}</a>`;
+        });
+    });
+    return result;
+};
+
+const BlockRenderer: React.FC<{ block: BlogBlock, products?: Product[], keywords?: Record<string, string> }> = ({ block, products, keywords }) => {
     switch (block.type) {
+        case 'heading':
+            const id = slugify(block.content);
+            return <h2 id={id} className="text-3xl md:text-4xl font-black text-charcoal mt-16 mb-8 scroll-mt-24">{block.content}</h2>;
+        case 'image':
+            return (
+                <figure className="my-12 group">
+                    <div className="rounded-[2.5rem] overflow-hidden shadow-xl ring-1 ring-black/5">
+                        <img
+                            src={block.content.startsWith('http') ? block.content : `${api.baseUrl}${block.content}`}
+                            className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-1000"
+                            alt={block.alt || 'Blog image'}
+                            loading="lazy"
+                        />
+                    </div>
+                    {block.caption && (
+                        <figcaption className="text-center mt-4 text-sm text-charcoal/50 italic font-medium px-4">
+                            {block.caption}
+                        </figcaption>
+                    )}
+                </figure>
+            );
         case 'quote':
             return (
                 <div
-                    className="my-10 p-10 rounded-3xl border border-primary/10 relative"
+                    className="my-12 p-12 rounded-[2.5rem] border border-primary/10 relative overflow-hidden group"
                     style={{
                         backgroundColor: block.styles?.backgroundColor || 'transparent',
-                        fontFamily: block.styles?.fontFamily === 'serif' ? 'Playfair Display, serif' : 'inherit'
                     }}
                 >
-                    <span className="text-6xl text-primary/20 absolute top-4 left-6 font-serif">"</span>
-                    <blockquote className="text-2xl md:text-3xl font-bold text-charcoal italic leading-snug relative z-10">
+                    <div className="absolute top-0 left-0 w-2 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                    <span className="text-8xl text-primary/10 absolute -top-4 -left-2 font-serif select-none">"</span>
+                    <blockquote className="text-2xl md:text-3xl font-black text-charcoal italic leading-tight relative z-10 pr-4">
                         {block.content}
                     </blockquote>
                 </div>
@@ -23,25 +84,27 @@ const BlockRenderer: React.FC<{ block: BlogBlock, products?: Product[] }> = ({ b
         case 'tip':
             return (
                 <div
-                    className="my-8 p-6 rounded-2xl text-white shadow-lg"
+                    className="my-10 p-8 rounded-3xl text-white shadow-xl flex gap-5 items-start"
                     style={{ backgroundColor: block.styles?.backgroundColor || '#e28d68' }}
                 >
-                    <div className="flex items-center gap-2 mb-3">
-                        <Lightbulb className="w-5 h-5" />
-                        <span className="font-bold text-sm uppercase tracking-wider opacity-90">Quick Tip</span>
+                    <div className="bg-white/20 p-3 rounded-2xl shrink-0">
+                        <Lightbulb className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-lg leading-relaxed">{block.content}</p>
+                    <div>
+                        <span className="font-black text-xs uppercase tracking-[0.2em] opacity-80 mb-2 block">Mẹo từ chuyên gia</span>
+                        <p className="text-xl font-bold leading-relaxed">{block.content}</p>
+                    </div>
                 </div>
             );
         case 'podcast':
             return (
-                <div className="my-8 p-6 rounded-2xl bg-paper border-l-4 border-primary shadow-sm flex items-center gap-4">
-                    <div className="flex size-12 items-center justify-center rounded-full bg-primary text-white shrink-0">
-                        <Play className="w-5 h-5 fill-current ml-1" />
+                <div className="my-10 p-8 rounded-3xl bg-white border border-stone-100 shadow-sm flex items-center gap-6 group hover:shadow-xl transition-all">
+                    <div className="size-16 items-center justify-center rounded-2xl bg-primary text-white flex shrink-0 shadow-lg group-hover:scale-110 transition-transform">
+                        <Play className="w-6 h-6 fill-current ml-1" />
                     </div>
                     <div>
-                        <span className="text-xs font-bold text-primary uppercase tracking-widest">Podcast Episode</span>
-                        <h4 className="text-xl font-bold text-charcoal">{block.content}</h4>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1 block">Nghe bản tin Podcast</span>
+                        <h4 className="text-2xl font-black text-charcoal">{block.content}</h4>
                     </div>
                 </div>
             );
@@ -49,33 +112,70 @@ const BlockRenderer: React.FC<{ block: BlogBlock, products?: Product[] }> = ({ b
             const linkedProduct = products?.find(p => p.id === block.productId);
             if (!linkedProduct) return null;
             return (
-                <div className="my-10">
+                <div className="my-12">
                     <Link
-                        to={`/product/${linkedProduct.slug}`}
-                        className="flex items-center gap-6 p-6 rounded-3xl bg-white border border-stone-100 hover:border-primary/30 transition-all hover:shadow-xl group"
+                        to={`/product/${linkedProduct.id}`}
+                        className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-[2.5rem] bg-white border border-stone-100 hover:border-primary/30 transition-all hover:shadow-2xl group relative overflow-hidden"
                     >
-                        <div className="w-32 h-32 rounded-2xl overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 p-4 bg-primary/5 rounded-bl-3xl">
+                            <ShoppingBag className="w-6 h-6 text-primary/40 group-hover:text-primary transition-colors" />
+                        </div>
+                        <div className="w-full md:w-48 h-48 rounded-[2rem] overflow-hidden shrink-0 shadow-md">
                             <img
                                 src={linkedProduct.image?.startsWith('http') ? linkedProduct.image : `${api.baseUrl}${linkedProduct.image}`}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                                 alt={linkedProduct.name}
-                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/128?text=ERR'; }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=Product'; }}
                             />
                         </div>
-                        <div className="flex-1">
-                            <span className="text-primary font-bold text-xs uppercase tracking-widest mb-1 block">Sản phẩm nhắc đến</span>
-                            <h4 className="text-xl font-bold text-charcoal mb-2 group-hover:text-primary transition-colors">{linkedProduct.name}</h4>
-                            <p className="text-2xl font-black text-charcoal">
-                                {linkedProduct.price.toLocaleString('vi-VN')}đ
-                            </p>
+                        <div className="flex-1 text-center md:text-left">
+                            <span className="text-primary font-black text-[10px] uppercase tracking-[0.2em] mb-3 block">Sản phẩm nổi bật</span>
+                            <h4 className="text-2xl font-black text-charcoal mb-4 group-hover:text-primary transition-colors leading-tight">{linkedProduct.name}</h4>
+                            <div className="flex items-center justify-center md:justify-start gap-3">
+                                <p className="text-3xl font-black text-charcoal">
+                                    {linkedProduct.price.toLocaleString('vi-VN')}đ
+                                </p>
+                                <button className="ml-4 bg-primary text-white px-6 py-2 rounded-full text-sm font-black shadow-lg shadow-primary/20 hover:scale-105 transition-transform">Mua ngay</button>
+                            </div>
                         </div>
-                        <ShoppingBag className="w-8 h-8 text-stone-200 group-hover:text-primary transition-colors" />
                     </Link>
                 </div>
             );
         default: // text
-            return <p className="mb-6 text-lg md:text-xl text-charcoal/80 leading-relaxed">{block.content}</p>;
+            const processedText = keywords ? applyAutolinks(block.content, keywords) : block.content;
+            return <p className="mb-8 text-xl text-charcoal/80 leading-[1.8] font-medium whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: processedText }} />;
     }
+};
+
+const TableOfContents: React.FC<{ blocks: BlogBlock[] }> = ({ blocks }) => {
+    const headings = blocks.filter(b => b.type === 'heading');
+    if (headings.length < 2) return null;
+
+    return (
+        <div className="my-16 p-8 md:p-10 rounded-[2.5rem] bg-white border border-stone-100 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
+            <h3 className="text-xl font-black text-charcoal mb-8 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center text-xs">01</span>
+                Nội dung chính
+            </h3>
+            <nav className="space-y-4">
+                {headings.map((h, i) => (
+                    <a
+                        key={i}
+                        href={`#${slugify(h.content)}`}
+                        className="flex items-start gap-4 text-charcoal/60 hover:text-primary transition-all group py-1"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById(slugify(h.content))?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                    >
+                        <span className="text-[10px] font-black mt-1.5 opacity-20 group-hover:opacity-100 transition-opacity">{(i + 1).toString().padStart(2, '0')}</span>
+                        <span className="font-bold text-lg leading-tight border-b border-transparent group-hover:border-primary/20">{h.content}</span>
+                    </a>
+                ))}
+            </nav>
+        </div>
+    );
 };
 
 const BlogDetail: React.FC = () => {
@@ -89,13 +189,10 @@ const BlogDetail: React.FC = () => {
             if (!slug) return;
             setIsLoading(true);
             try {
-                console.log('Fetching post for slug:', slug);
                 const data = await api.getBlogBySlug(slug);
-                console.log('Post data received:', data);
                 setPost(data);
             } catch (error) {
                 console.error('Failed to fetch blog post', error);
-                // Don't navigate away yet, let's see the error
             } finally {
                 setIsLoading(false);
             }
@@ -105,8 +202,9 @@ const BlogDetail: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <div className="min-h-[80vh] flex flex-col items-center justify-center gap-4">
+                <Loader2 className="w-12 h-12 animate-spin text-primary opacity-20" />
+                <p className="text-stone-400 font-black uppercase tracking-[0.2em] text-[10px]">Đang tải nội dung...</p>
             </div>
         );
     }
@@ -115,10 +213,10 @@ const BlogDetail: React.FC = () => {
         return (
             <div className="min-h-screen bg-cream flex items-center justify-center p-6">
                 <div className="text-center max-w-md">
-                    <h1 className="text-3xl font-black text-charcoal mb-4">Không tìm thấy bài viết</h1>
-                    <p className="text-charcoal/60 mb-8 font-bold">Chúng mình không tìm thấy nội dung cho đường dẫn này: <strong>{slug}</strong></p>
-                    <Link to="/blog" className="inline-flex items-center gap-2 text-primary hover:bg-primary/10 px-6 py-3 rounded-full font-bold transition-all border border-primary/20">
-                        <ArrowLeft className="w-5 h-5" /> Quay lại Blog
+                    <h1 className="text-3xl font-black text-charcoal mb-4">Mất dấu rồi... 🍃</h1>
+                    <p className="text-charcoal/60 mb-8 font-bold leading-relaxed">Bài viết này đã được dời đi hoặc không tồn tại. Thử tìm nội dung khác xem?</p>
+                    <Link to="/blog" className="inline-flex items-center gap-3 bg-charcoal text-white px-10 py-4 rounded-full font-black transition-all hover:bg-primary shadow-xl shadow-charcoal/10">
+                        <ArrowLeft className="w-5 h-5" /> Trở lại Blog
                     </Link>
                 </div>
             </div>
@@ -126,72 +224,82 @@ const BlogDetail: React.FC = () => {
     }
 
     return (
-        <div className="bg-cream min-h-screen pb-20">
-            {/* Navigation */}
-            <div className="max-w-[850px] mx-auto px-6 py-8">
-                <Link to="/blog" className="inline-flex items-center gap-2 text-charcoal/60 hover:text-primary transition-colors font-bold">
-                    <ArrowLeft className="w-5 h-5" /> Quay lại Blog
+        <div className="bg-cream min-h-screen pb-32">
+            {/* Header / Hero Area */}
+            <div className="max-w-[1000px] mx-auto px-6 pt-12">
+                <Link to="/blog" className="inline-flex items-center gap-2 text-charcoal/40 hover:text-primary transition-colors text-xs font-black uppercase tracking-widest mb-12">
+                    <ArrowLeft className="w-4 h-4" /> Quay lại danh sách
                 </Link>
-            </div>
 
-            <article className="max-w-[850px] mx-auto px-6">
-                {/* Header */}
-                <div className="mb-14 text-center">
-                    <div className="flex items-center justify-center gap-4 mb-8">
+                <div className="mb-16">
+                    <div className="flex flex-wrap items-center justify-start gap-3 mb-8">
                         {post.tags.map(tag => (
-                            <span key={tag} className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">{tag}</span>
+                            <span key={tag} className="bg-white border border-stone-100 text-charcoal/60 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">{tag}</span>
                         ))}
                     </div>
-                    <h1 className="font-display text-4xl md:text-6xl font-black text-charcoal leading-tight mb-10 tracking-tight">{post.title}</h1>
-                    <div className="flex items-center justify-center gap-8 text-charcoal/40 text-sm font-bold uppercase tracking-widest">
-                        <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4" /> 5-min read
+                    <h1 className="font-display text-5xl md:text-7xl font-black text-charcoal leading-[1.1] mb-12 tracking-tight">
+                        {post.title}
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-8 text-charcoal/40 text-[10px] font-black uppercase tracking-[0.2em]">
+                        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-stone-100">
+                            <Clock className="w-4 h-4 text-primary" /> 7-min read
                         </div>
-                        <div>•</div>
-                        <div>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</div>
+                        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-stone-100">
+                            Published {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+                        </div>
                     </div>
                 </div>
 
                 {/* Cover Image */}
                 {post.image && (
-                    <div className="mb-16 rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-black/5">
+                    <div className="mb-20 rounded-[3rem] overflow-hidden shadow-2xl shadow-primary/5 ring-1 ring-black/5 animate-in fade-in zoom-in duration-1000">
                         <img
                             src={post.image.startsWith('http') ? post.image : `${api.baseUrl}${post.image}`}
-                            className="w-full h-auto object-cover max-h-[600px]"
+                            className="w-full h-auto object-cover max-h-[700px] hover:scale-105 transition-transform duration-[2000ms]"
                             alt={post.title}
-                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/850x500?text=ERR'; }}
                         />
                     </div>
                 )}
+            </div>
 
-                {/* Content Blocks */}
-                <div className="max-w-[700px] mx-auto">
+            {/* Main Content */}
+            <article className="max-w-[750px] mx-auto px-6">
+                <div className="content-renderer">
+                    <TableOfContents blocks={post.content} />
+
                     {post.content.map((block, index) => (
-                        <BlockRenderer key={index} block={block} products={post.relatedProducts} />
+                        <BlockRenderer
+                            key={index}
+                            block={block}
+                            products={post.relatedProducts}
+                            keywords={post.seoKeywords}
+                        />
                     ))}
                 </div>
 
-                {/* Footer Shop Section */}
+                {/* Article Footer Shop */}
                 {post.relatedProducts && post.relatedProducts.length > 0 && (
-                    <div className="mt-20 pt-20 border-t border-stone-200">
-                        <h2 className="font-display text-4xl font-black text-charcoal mb-12 text-center">Shop the Story</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="mt-32 pt-20 border-t border-stone-200">
+                        <div className="text-center mb-16 space-y-3">
+                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Curated Collection</span>
+                            <h2 className="font-display text-5xl font-black text-charcoal">Sản phẩm trong bài</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             {post.relatedProducts.map(product => (
                                 <Link
                                     key={product.id}
-                                    to={`/product/${product.slug}`}
-                                    className="group"
+                                    to={`/product/${product.id}`}
+                                    className="group flex flex-col items-center"
                                 >
-                                    <div className="aspect-square rounded-[2rem] overflow-hidden mb-6 shadow-sm group-hover:shadow-xl transition-all duration-500">
+                                    <div className="aspect-square w-full rounded-[2.5rem] overflow-hidden mb-8 shadow-sm group-hover:shadow-2xl transition-all duration-700 ring-1 ring-black/5">
                                         <img
                                             src={product.image?.startsWith('http') ? product.image : `${api.baseUrl}${product.image}`}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                                             alt={product.name}
-                                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=ERR'; }}
                                         />
                                     </div>
-                                    <h3 className="font-bold text-xl text-charcoal group-hover:text-primary transition-colors text-center">{product.name}</h3>
-                                    <p className="text-primary font-black mt-2 text-2xl text-center">
+                                    <h3 className="font-black text-2xl text-charcoal group-hover:text-primary transition-colors text-center leading-tight mb-2">{product.name}</h3>
+                                    <p className="text-primary font-black text-3xl text-center">
                                         {product.price.toLocaleString('vi-VN')}đ
                                     </p>
                                 </Link>
@@ -200,6 +308,21 @@ const BlogDetail: React.FC = () => {
                     </div>
                 )}
             </article>
+
+            {/* Newsletter Shortcut */}
+            <div className="max-w-[1000px] mx-auto px-6 mt-32">
+                <div className="bg-charcoal rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
+                    <div className="relative z-10 max-w-xl mx-auto space-y-6">
+                        <h2 className="text-3xl md:text-5xl font-display font-black text-white leading-tight">Yêu những trang viết?</h2>
+                        <p className="text-white/60 text-lg font-medium">Nhận thông báo khi có bài viết mới và ưu đãi độc quyền hàng tuần.</p>
+                        <form className="flex flex-col sm:flex-row gap-3 pt-6" onSubmit={(e) => e.preventDefault()}>
+                            <input type="email" placeholder="Email của bạn..." className="flex-1 px-8 py-5 rounded-full border-none focus:ring-2 focus:ring-primary/50 outline-none text-charcoal bg-white font-bold" required />
+                            <button className="bg-primary text-white font-black px-10 py-5 rounded-full hover:scale-105 transition-all shadow-xl shadow-primary/20">Tham gia ngay</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

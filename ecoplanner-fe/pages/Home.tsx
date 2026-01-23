@@ -2,9 +2,11 @@ import React from 'react';
 import { PlayCircle, ArrowRight, Star, Leaf, PenTool, Sprout, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import HomeProductSection from '../components/HomeProductSection';
+
 const Home: React.FC = () => {
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-4 pb-20 space-y-12">
+    <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-4 pb-20 space-y-24">
       {/* Hero Section */}
       <section className="bg-paper rounded-[2.5rem] p-6 lg:p-8 shadow-sm border border-stone-100 flex flex-col-reverse lg:flex-row gap-12 lg:h-[600px] overflow-hidden relative">
         <div className="flex-1 flex flex-col justify-center items-start z-10 lg:pl-8">
@@ -44,6 +46,9 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Featured Products with Categories */}
+      <HomeProductSection />
 
       {/* Bento Grid */}
       <section>
