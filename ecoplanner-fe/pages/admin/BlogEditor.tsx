@@ -95,15 +95,9 @@ const AdminBlogEditor: React.FC = () => {
                         config: { levels: [2, 3, 4], defaultLevel: 2 }
                     },
                     list: { class: List as any, inlineToolbar: true },
-                    quote: { class: QuoteTool as any, inlineToolbar: true },
-                    delimiter: Delimiter,
-                    inlineCode: InlineCode,
-                    table: Table,
-                    checklist: Checklist,
-                    marker: Marker,
-                    underline: Underline,
                     image: {
                         class: ImageTool as any,
+                        inlineToolbar: true,
                         config: {
                             uploader: {
                                 async uploadByFile(file: File) {
@@ -115,7 +109,14 @@ const AdminBlogEditor: React.FC = () => {
                                 }
                             }
                         }
-                    }
+                    },
+                    table: { class: Table as any, inlineToolbar: true },
+                    quote: { class: QuoteTool as any, inlineToolbar: true },
+                    delimiter: Delimiter,
+                    checklist: { class: Checklist as any, inlineToolbar: true },
+                    inlineCode: InlineCode,
+                    marker: Marker,
+                    underline: Underline,
                 },
                 placeholder: 'Bắt đầu viết nội dung tuyệt vời của bạn tại đây...',
             });
