@@ -356,76 +356,203 @@ async function main() {
 
     console.log(`✅ Created sample conversation`);
 
-    // ============ BLOG POSTS ============
-    const blosPosts = await Promise.all([
+    // ============ BLOG POSTS (10 Editor.js compatible posts) ============
+    const blogPosts = await Promise.all([
         prisma.blogPost.create({
             data: {
-                title: 'Finding Peace in Daily Planning',
-                slug: 'finding-peace-in-daily-planning',
-                content: [
-                    { type: 'text', content: 'Tại sao việc viết ra kế hoạch mỗi sáng lại giúp bạn giảm bớt lo âu? Khám phá 3 phương pháp journaling giúp bạn giữ tâm trí bình thản giữa bộn bề công việc.' },
-                    { type: 'quote', content: 'Lập kế hoạch không phải là kiểm soát tương lai, mà là giúp bạn hiện diện trọn vẹn trong hiện tại.', styles: { backgroundColor: '#fdf6e3', fontFamily: 'serif' } },
-                    { type: 'text', content: 'Journaling không chỉ là ghi chép, đó là cách bạn đối thoại với chính mình. Hãy bắt đầu bằng những dòng đơn giản nhất.' }
-                ],
-                excerpt: 'Tại sao việc viết ra kế hoạch mỗi sáng lại giúp bạn giảm bớt lo âu? Khám phá 3 phương pháp...',
-                image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800',
+                title: 'Sống Xanh Cùng Văn Phòng Phẩm Bền Vững',
+                slug: 'song-xanh-cung-van-phong-pham-ben-vung',
+                excerpt: 'Khám phá cách lựa chọn văn phòng phẩm thân thiện với môi trường để bảo vệ hành tinh xanh của chúng ta.',
+                image: 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=800',
+                type: 'ARTICLE',
+                tags: ['Bảo vệ môi trường', 'Sống chậm'],
+                seoKeywords: { "văn phòng phẩm": "/shop", "môi trường": "/about" },
+                relatedProductIds: [products[7].id, products[13].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Tại sao văn phòng phẩm bền vững lại quan trọng?', level: 2 } },
+                        { type: 'paragraph', data: { text: 'Trong kỷ nguyên của sự tiêu dùng nhanh, việc lựa chọn văn phòng phẩm bền vững là một bước đi nhỏ nhưng ý nghĩa để giảm thiểu rác thải nhựa.' } },
+                        { type: 'image', data: { file: { url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800' }, caption: 'Sổ tay tái chế Eco-Green' } },
+                        { type: 'list', data: { style: 'unordered', items: ['Sử dụng giấy tái chế 100%', 'Mực in thực vật không độc hại', 'Bìa sổ làm từ vật liệu tự nhiên'] } },
+                        { type: 'quote', data: { text: 'Chúng ta không thừa hưởng Trái Đất từ tổ tiên, chúng ta mượn nó từ con cháu mình.', caption: 'Châm ngôn bảo vệ môi trường' } }
+                    ]
+                }
+            }
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Nghi Thức Buổi Sáng Cho Ngày Làm Việc Hiệu Quả',
+                slug: 'nghi-thuc-buoi-sang-hieu-qua',
+                excerpt: 'Làm thế nào để bắt đầu ngày mới tràn đầy năng lượng và tập trung? Hãy cùng MEDE xây dựng thói quen buổi sáng.',
+                image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800',
+                type: 'ARTICLE',
+                tags: ['Mẹo lập kế hoạch', 'Sống chậm'],
+                seoKeywords: { "kế hoạch": "/shop", "mục tiêu": "/shop" },
+                relatedProductIds: [products[2].id, products[19].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: '3 Bước xây dựng thói quen buổi sáng', level: 2 } },
+                        { type: 'paragraph', data: { text: 'Việc lập kế hoạch trước khi bắt đầu công việc giúp bộ não của bạn được giải phóng khỏi những lo âu về danh sách công việc khổng lồ.' } },
+                        { type: 'checklist', data: { items: [{ text: 'Uống 1 ly nước ấm', checked: true }, { text: 'Dành 10 phút viết Daily Planner', checked: false }, { text: 'Thiền định nhẹ nhàng', checked: false }] } },
+                        { type: 'table', data: { content: [['Thời gian', 'Hoạt động'], ['6:00', 'Thức dậy'], ['6:30', 'Viết Journaling'], ['7:00', 'Lên kế hoạch ngày']] } }
+                    ]
+                }
+            }
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Nghệ Thuật Sống Chậm (Slow Living)',
+                slug: 'nghe-thuat-song-cham',
+                excerpt: 'Journaling không chỉ là ghi chép, đó là cách bạn đối thoại với chính mình để tìm thấy sự an yên.',
+                image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800',
                 type: 'ARTICLE',
                 tags: ['Sống chậm', 'Journaling'],
-                relatedProductIds: [products[0].id, products[7].id],
-            },
+                seoKeywords: { "journaling": "/shop", "an yên": "/blog" },
+                relatedProductIds: [products[10].id, products[12].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Tìm thấy bình yên trong từng trang viết', level: 2 } },
+                        { type: 'paragraph', data: { text: 'Slow living không phải là làm mọi thứ chậm lại, mà là làm mọi thứ ở một tốc độ đúng đắn.' } },
+                        { type: 'quote', data: { text: 'The point of slow living is to live better, not slower.', caption: 'Carl Honoré' } },
+                        { type: 'delimiter', data: {} },
+                        { type: 'paragraph', data: { text: 'Hãy thử viết ra 3 điều bạn biết ơn mỗi tối để cảm nhận sự thay đổi tích cực trong tâm hồn.' } }
+                    ]
+                }
+            }
         }),
         prisma.blogPost.create({
             data: {
-                title: 'Less but better. Đơn giản hóa cuộc sống không phải là vứt bỏ đồ đạc.',
-                slug: 'less-but-better',
-                content: [
-                    { type: 'quote', content: 'Less but better. Đơn giản hóa cuộc sống không phải là vứt bỏ đồ đạc.', styles: { backgroundColor: '#f3f4f6', fontFamily: 'serif' } }
-                ],
-                type: 'QUOTE',
+                title: 'Lên Thực Đơn Không Rác Thải',
+                slug: 'len-thuc-don-khong-rac-thai',
+                excerpt: 'Tiết kiệm thời gian và bảo vệ môi trường bằng cách lên thực đơn tuần thông minh.',
+                image: 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=800',
+                type: 'ARTICLE',
+                tags: ['Bảo vệ môi trường', 'Mẹo lập kế hoạch'],
+                seoKeywords: { "thực đơn": "/product/meal-planner-recipe-book" },
+                relatedProductIds: [products[9].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Cách bắt đầu Meal Planning', level: 2 } },
+                        { type: 'paragraph', data: { text: 'Lên thực đơn giúp bạn mua sắm đúng nhu cầu, tránh lãng phí thực phẩm và tiền bạc.' } },
+                        { type: 'list', data: { style: 'ordered', items: ['Kiểm tra tủ lạnh trước khi đi chợ', 'Lên danh sách theo nhóm thực phẩm', 'Chuẩn bị nguyên liệu sơ chế sẵn'] } }
+                    ]
+                }
+            }
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Đạt Được Mục Tiêu Thông Minh (SMART)',
+                slug: 'dat-duoc-muc-tieu-smart',
+                excerpt: 'Hướng dẫn chi tiết phương pháp đặt mục tiêu SMART để biến ước mơ thành hiện thực.',
+                image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800',
+                type: 'ARTICLE',
+                tags: ['Mẹo lập kế hoạch'],
+                seoKeywords: { "mục tiêu": "/product/goal-planner-vision-board" },
+                relatedProductIds: [products[3].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Phương pháp SMART là gì?', level: 2 } },
+                        { type: 'table', data: { content: [['S', 'Specific', 'Cụ thể'], ['M', 'Measurable', 'Đo lường được'], ['A', 'Achievable', 'Khả thi'], ['R', 'Relevant', 'Thỏa đáng'], ['T', 'Time-bound', 'Hạn định thời gian']] } },
+                        { type: 'paragraph', data: { text: 'Việc sử dụng một cuốn sổ đặt mục tiêu chuyên dụng sẽ giúp bạn bám sát lộ trình đã đề ra.' } }
+                    ]
+                }
+            }
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Quản Lý Tài Chính Cho Sinh Viên',
+                slug: 'quan-ly-tai-chinh-sinh-vien',
+                excerpt: 'Tự do tài chính bắt đầu từ những thói quen nhỏ ngay từ khi còn ở giảng đường.',
+                image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
+                type: 'ARTICLE',
+                tags: ['Mẹo lập kế hoạch'],
+                seoKeywords: { "tài chính": "/product/budget-planner-pro" },
+                relatedProductIds: [products[4].id, products[6].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Quy tắc 50/30/20', level: 2 } },
+                        { type: 'paragraph', data: { text: 'Dành 50% cho nhu cầu thiết yếu, 30% cho sở thích và 20% cho tiết kiệm.' } },
+                        { type: 'quote', data: { text: 'Đừng tiết kiệm những gì còn lại sau khi tiêu xài, hãy tiêu xài những gì còn lại sau khi tiết kiệm.', caption: 'Warren Buffett' } }
+                    ]
+                }
+            }
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Năng Suất Cùng Thiên Nhiên',
+                slug: 'nang-suat-cung-thien-nhien',
+                excerpt: 'Tại sao làm việc trong môi trường gần gũi thiên nhiên lại giúp tăng 20% khả năng sáng tạo?',
+                image: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?w=800',
+                type: 'ARTICLE',
                 tags: ['Sống chậm'],
-                createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-            },
+                seoKeywords: { "sáng tạo": "/shop" },
+                relatedProductIds: [products[16].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Lợi ích của Biophilic Design', level: 2 } },
+                        { type: 'paragraph', data: { text: 'Thêm cây xanh vào bàn làm việc hoặc đơn giản là sử dụng các vật liệu tự nhiên như gỗ và giấy giúp giảm stress hiệu quả.' } },
+                        { type: 'image', data: { file: { url: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=800' }, caption: 'Góc làm việc tràn đầy cảm hứng' } }
+                    ]
+                }
+            }
         }),
         prisma.blogPost.create({
             data: {
-                title: 'Sustainable Stationery Choices for 2024',
-                slug: 'sustainable-stationery-choices-2024',
-                content: [
-                    { type: 'text', content: 'Khám phá những lựa chọn văn phòng phẩm thân thiện với môi trường, từ giấy tái chế đến bút có thể nạp lại mực...' },
-                    { type: 'product', content: 'Sổ tay tái chế Eco-Green', productId: products[7].id }
-                ],
-                image: 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?q=80&w=800',
+                title: 'Digital Detox - Trở Lại Với Giấy Và Bút',
+                slug: 'digital-detox-giay-but',
+                excerpt: 'Thoát khỏi sự ồn ào của thông báo điện thoại để tìm lại sự tập trung sâu sắc nhất.',
+                image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800',
+                type: 'ARTICLE',
+                tags: ['Journaling', 'Sống chậm'],
+                seoKeywords: { "tập trung": "/shop" },
+                relatedProductIds: [products[0].id, products[7].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Sức mạnh của việc viết tay', level: 2 } },
+                        { type: 'paragraph', data: { text: 'Nghiên cứu chỉ ra rằng việc viết tay giúp ghi nhớ kiến thức tốt hơn 30% so với gõ bàn phím.' } },
+                        { type: 'quote', data: { text: 'Paper is to the mind what canvas is to the painter.', caption: 'Anonymous' } }
+                    ]
+                }
+            }
+        }),
+        prisma.blogPost.create({
+            data: {
+                title: 'Quà Tặng Ý Nghĩa & Thân Thiện',
+                slug: 'qua-tang-eco-y-nghia',
+                excerpt: 'Gợi ý các combo quà tặng Eco dành cho những người thân yêu trong những dịp đặc biệt.',
+                image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800',
                 type: 'ARTICLE',
                 tags: ['Bảo vệ môi trường'],
-                relatedProductIds: [products[7].id, products[2].id],
-            },
+                relatedProductIds: [products[14].id, products[17].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Combo Quà Tặng Xanh', level: 2 } },
+                        { type: 'list', data: { style: 'unordered', items: ['Sổ Planner + Bút gỗ thân thiện', 'Set Journaling + Sticker hữu cơ', 'Combo Wedding Planner cho cô dâu chú rể'] } }
+                    ]
+                }
+            }
         }),
         prisma.blogPost.create({
             data: {
-                title: 'Pomodoro không chỉ để làm việc.',
-                slug: 'pomodoro-not-just-for-work',
-                content: [
-                    { type: 'tip', content: 'Hãy thử dùng 25 phút tập trung để dọn dẹp, đọc sách, hoặc thậm chí là... không làm gì cả.', styles: { backgroundColor: '#e28d68' } }
-                ],
-                type: 'TIP',
-                tags: ['Mẹo lập kế hoạch'],
-            },
-        }),
-        prisma.blogPost.create({
-            data: {
-                title: 'Ep 12: Digital Minimalism với Cal Newport',
-                slug: 'ep-12-digital-minimalism',
-                content: [
-                    { type: 'podcast', content: 'Trong tập podcast này, chúng ta sẽ thảo luận về việc tối giản hóa sự hiện diện kỹ thuật số...' }
-                ],
-                type: 'PODCAST',
-                tags: ['Sống chậm'],
-                relatedProductIds: [products[0].id],
-            },
+                title: 'Nhìn Lại Hành Trình Một Năm',
+                slug: 'nhin-lai-hanh-trinh-mot-nam',
+                excerpt: 'Dành thời gian cuối năm để review và chuẩn bị cho một chương mới rực rỡ hơn.',
+                image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800',
+                type: 'ARTICLE',
+                tags: ['Journaling', 'Mẹo lập kế hoạch'],
+                relatedProductIds: [products[0].id, products[3].id],
+                content: {
+                    blocks: [
+                        { type: 'header', data: { text: 'Câu hỏi gợi ý để review năm cũ', level: 2 } },
+                        { type: 'list', data: { style: 'ordered', items: ['Thành tựu lớn nhất của bạn là gì?', 'Bài học quý giá nhất bạn học được?', 'Điều gì bạn muốn buông bỏ trong năm tới?'] } },
+                        { type: 'paragraph', data: { text: 'Hãy sử dụng sổ Vision Board để bắt đầu phác thảo cho năm mới nhé!' } }
+                    ]
+                }
+            }
         }),
     ]);
 
-    console.log(`✅ Created ${blosPosts.length} blog posts`);
+    console.log(`✅ Created ${blogPosts.length} blog posts`);
 
     console.log('🎉 Seeding completed!');
 }
