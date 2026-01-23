@@ -18,7 +18,8 @@ router.get('/', async (req: Request, res: Response) => {
 
         res.json(posts);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch blog posts' });
+        console.error('Error fetching blogs:', error);
+        res.status(500).json({ error: 'Failed to fetch blog posts', details: (error as Error).message });
     }
 });
 // Get single blog post by slug (public)
