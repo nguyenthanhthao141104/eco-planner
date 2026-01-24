@@ -59,8 +59,8 @@ const AdminOrders: React.FC = () => {
 
     const filteredOrders = orders.filter(o =>
         o.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        o.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        o.user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        o.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        o.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (isLoading) {
@@ -126,8 +126,8 @@ const AdminOrders: React.FC = () => {
                                         <ShoppingBag className="w-5 h-5 text-gray-500" />
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-[#1a2e24]">{order.user.name}</p>
-                                        <p className="text-sm text-gray-500">{order.user.email}</p>
+                                        <p className="font-semibold text-[#1a2e24]">{order.user?.name || 'Khách vãng lai'}</p>
+                                        <p className="text-sm text-gray-500">{order.user?.email || 'Chưa cung cấp email'}</p>
                                     </div>
                                 </div>
 
@@ -157,8 +157,8 @@ const AdminOrders: React.FC = () => {
                                                     onClick={() => handleStatusChange(order.id, nextStatus)}
                                                     disabled={updatingId === order.id}
                                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${nextStatus === 'CANCELLED'
-                                                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                                            : 'bg-green-50 text-green-700 hover:bg-green-100'
+                                                        ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                                        : 'bg-green-50 text-green-700 hover:bg-green-100'
                                                         } disabled:opacity-50`}
                                                 >
                                                     {updatingId === order.id ? (

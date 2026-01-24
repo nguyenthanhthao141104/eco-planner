@@ -266,10 +266,10 @@ async function main() {
         });
         products.push(prod);
     }
-    console.log(`✅ ${products.length} products ensured`);
+    console.log(`✅ \${products.length} products ensured`);
 
     // 4. BLOG POSTS
-    console.log('📝 Seeding blog posts (sequential to avoid crashes)...');
+    console.log('📝 Seeding blog posts (sequential with upsert)...');
     const blogPostsData = [
         {
             title: 'Sống Xanh Cùng Văn Phòng Phẩm Bền Vững',
@@ -284,9 +284,6 @@ async function main() {
                 blocks: [
                     { type: 'header', data: { text: 'Tại sao văn phòng phẩm bền vững lại quan trọng?', level: 2 } },
                     { type: 'paragraph', data: { text: 'Trong kỷ nguyên của sự tiêu dùng nhanh, việc lựa chọn văn phòng phẩm bền vững là một bước đi nhỏ nhưng ý nghĩa để giảm thiểu rác thải nhựa.' } },
-                    { type: 'image', data: { file: { url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800' }, caption: 'Sổ tay tái chế Eco-Green' } },
-                    { type: 'list', data: { style: 'unordered', items: ['Sử dụng giấy tái chế 100%', 'Mực in thực vật không độc hại', 'Bìa sổ làm từ vật liệu tự nhiên'] } },
-                    { type: 'quote', data: { text: 'Chúng ta không thừa hưởng Trái Đất từ tổ tiên, chúng ta mượn nó từ con cháu mình.', caption: 'Châm ngôn bảo vệ môi trường' } }
                 ]
             }
         },
@@ -303,8 +300,6 @@ async function main() {
                 blocks: [
                     { type: 'header', data: { text: '3 Bước xây dựng thói quen buổi sáng', level: 2 } },
                     { type: 'paragraph', data: { text: 'Việc lập kế hoạch trước khi bắt đầu công việc giúp bộ não của bạn được giải phóng khỏi những lo âu về danh sách công việc khổng lồ.' } },
-                    { type: 'checklist', data: { items: [{ text: 'Uống 1 ly nước ấm', checked: true }, { text: 'Dành 10 phút viết Daily Planner', checked: false }, { text: 'Thiền định nhẹ nhàng', checked: false }] } },
-                    { type: 'table', data: { content: [['Thời gian', 'Hoạt động'], ['6:00', 'Thức dậy'], ['6:30', 'Viết Journaling'], ['7:00', 'Lên kế hoạch ngày']] } }
                 ]
             }
         },
@@ -321,26 +316,9 @@ async function main() {
                 blocks: [
                     { type: 'header', data: { text: 'Tìm thấy bình yên trong từng trang viết', level: 2 } },
                     { type: 'paragraph', data: { text: 'Slow living không phải là làm mọi thứ chậm lại, mà là làm mọi thứ ở một tốc độ đúng đắn.' } },
-                    { type: 'quote', data: { text: 'The point of slow living is to live better, not slower.', caption: 'Carl Honoré' } },
-                    { type: 'delimiter', data: {} },
-                    { type: 'paragraph', data: { text: 'Hãy thử viết ra 3 điều bạn biết ơn mỗi tối để cảm nhận sự thay đổi tích cực trong tâm hồn.' } }
                 ]
             }
-        }
-        // ... (Adding more sequentially in code below)
-    ];
-
-    for (const b of blogPostsData) {
-        await prisma.blogPost.upsert({
-            where: { slug: b.slug },
-            update: {},
-            create: b
-        });
-        console.log(`  - Post "${b.title}" ensured`);
-    }
-
-    // Add remaining 7 posts sequentially
-    const extraPosts = [
+        },
         {
             title: 'Lên Thực Đơn Không Rác Thải',
             slug: 'len-thuc-don-khong-rac-thai',
@@ -354,7 +332,6 @@ async function main() {
                 blocks: [
                     { type: 'header', data: { text: 'Cách bắt đầu Meal Planning', level: 2 } },
                     { type: 'paragraph', data: { text: 'Lên thực đơn giúp bạn mua sắm đúng nhu cầu, tránh lãng phí thực phẩm và tiền bạc.' } },
-                    { type: 'list', data: { style: 'ordered', items: ['Kiểm tra tủ lạnh trước khi đi chợ', 'Lên danh sách theo nhóm thực phẩm', 'Chuẩn bị nguyên liệu sơ chế sẵn'] } }
                 ]
             }
         },
@@ -370,8 +347,6 @@ async function main() {
             content: {
                 blocks: [
                     { type: 'header', data: { text: 'Phương pháp SMART là gì?', level: 2 } },
-                    { type: 'table', data: { content: [['S', 'Specific', 'Cụ thể'], ['M', 'Measurable', 'Đo lường được'], ['A', 'Achievable', 'Khả thi'], ['R', 'Relevant', 'Thỏa đáng'], ['T', 'Time-bound', 'Hạn định thời gian']] } },
-                    { type: 'paragraph', data: { text: 'Việc sử dụng một cuốn sổ đặt mục tiêu chuyên dụng sẽ giúp bạn bám sát lộ trình đã đề ra.' } }
                 ]
             }
         },
@@ -387,8 +362,6 @@ async function main() {
             content: {
                 blocks: [
                     { type: 'header', data: { text: 'Quy tắc 50/30/20', level: 2 } },
-                    { type: 'paragraph', data: { text: 'Dành 50% cho nhu cầu thiết yếu, 30% cho sở thích và 20% cho tiết kiệm.' } },
-                    { type: 'quote', data: { text: 'Đừng tiết kiệm những gì còn lại sau khi tiêu xài, hãy tiêu xài những gì còn lại sau khi tiết kiệm.', caption: 'Warren Buffett' } }
                 ]
             }
         },
@@ -404,15 +377,13 @@ async function main() {
             content: {
                 blocks: [
                     { type: 'header', data: { text: 'Lợi ích của Biophilic Design', level: 2 } },
-                    { type: 'paragraph', data: { text: 'Thêm cây xanh vào bàn làm việc hoặc đơn giản là sử dụng các vật liệu tự nhiên như gỗ và giấy giúp giảm stress hiệu quả.' } },
-                    { type: 'image', data: { file: { url: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=800' }, caption: 'Góc làm việc tràn đầy cảm hứng' } }
                 ]
             }
         },
         {
             title: 'Digital Detox - Trở Lại Với Giấy Và Bút',
             slug: 'digital-detox-giay-but',
-            excerpt: 'Thoát khỏi sự ồn ào của thông báo điện thoại để tìm lại sự tập trung sâu sắc nhất.',
+            excerpt: 'Thoát khỏi sự ồn ào của thông báo điện thoại để tìm lại sự tập cung sâu sắc nhất.',
             image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800',
             type: BlogType.ARTICLE,
             tags: ['Journaling', 'Sống chậm'],
@@ -421,8 +392,6 @@ async function main() {
             content: {
                 blocks: [
                     { type: 'header', data: { text: 'Sức mạnh của việc viết tay', level: 2 } },
-                    { type: 'paragraph', data: { text: 'Nghiên cứu chỉ ra rằng việc viết tay giúp ghi nhớ kiến thức tốt hơn 30% so với gõ bàn phím.' } },
-                    { type: 'quote', data: { text: 'Paper is to the mind what canvas is to the painter.', caption: 'Anonymous' } }
                 ]
             }
         },
@@ -437,7 +406,6 @@ async function main() {
             content: {
                 blocks: [
                     { type: 'header', data: { text: 'Combo Quà Tặng Xanh', level: 2 } },
-                    { type: 'list', data: { style: 'unordered', items: ['Sổ Planner + Bút gỗ thân thiện', 'Set Journaling + Sticker hữu cơ', 'Combo Wedding Planner cho cô dâu chú rể'] } }
                 ]
             }
         },
@@ -452,14 +420,12 @@ async function main() {
             content: {
                 blocks: [
                     { type: 'header', data: { text: 'Câu hỏi gợi ý để review năm cũ', level: 2 } },
-                    { type: 'list', data: { style: 'ordered', items: ['Thành tựu lớn nhất của bạn là gì?', 'Bài học quý giá nhất bạn học được?', 'Điều gì bạn muốn buông bỏ trong năm tới?'] } },
-                    { type: 'paragraph', data: { text: 'Hãy sử dụng sổ Vision Board để bắt đầu phác thảo cho năm mới nhé!' } }
                 ]
             }
         }
     ];
 
-    for (const b of extraPosts) {
+    for (const b of blogPostsData) {
         await prisma.blogPost.upsert({
             where: { slug: b.slug },
             update: {},
@@ -468,6 +434,31 @@ async function main() {
         console.log(`  - Post "${b.title}" ensured`);
     }
     console.log('✅ Blog posts ensured');
+
+    // 5. SAMPLE ORDERS
+    console.log('📦 Seeding sample orders...');
+    const regularUser = await prisma.user.findFirst({ where: { email: 'nguyen.vana@gmail.com' } });
+    if (regularUser && products.length > 2) {
+        const orderId = 'TEST-ORDER-001';
+        await prisma.order.upsert({
+            where: { id: orderId },
+            update: {},
+            create: {
+                id: orderId,
+                userId: regularUser.id,
+                status: 'PENDING',
+                total: products[0].price + products[1].price,
+                note: 'Đơn hàng thử nghiệm từ seed script',
+                items: {
+                    create: [
+                        { productId: products[0].id, quantity: 1, price: products[0].price },
+                        { productId: products[1].id, quantity: 1, price: products[1].price },
+                    ]
+                }
+            }
+        });
+        console.log('✅ Sample order ensured');
+    }
 
     console.log('🎉 Seeding completed!');
 }

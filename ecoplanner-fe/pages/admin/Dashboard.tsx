@@ -39,10 +39,10 @@ const AdminDashboard: React.FC = () => {
 
          // Load dashboard stats
          try {
-            const statsData = await api.getDashboard();
+            const statsData = await api.getDashboard() as any;
             setStats({
                totalProducts: productsData.length,
-               totalOrders: statsData.todayOrders || 0,
+               totalOrders: statsData.totalOrders || 0,
                totalRevenue: statsData.todayRevenue || 0,
                pendingChats: statsData.pendingConversations || 0,
             });

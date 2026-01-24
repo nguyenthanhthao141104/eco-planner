@@ -19,15 +19,16 @@ router.get('/dashboard', authMiddleware, adminMiddleware, async (req: Authentica
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const [todayOrders, todayRevenue, pendingConversations, lowStockProducts, sentimentAverage, totalCustomers] = await Promise.all([
+        const [todayOrders, todayRevenue, pendingConversations, lowStockProducts, sentimentAverage, totalCustomers, totalOrders] = await Promise.all([
             prisma.order.count({ where: { createdAt: { gte: today } } }),
             prisma.order.aggregate({ where: { createdAt: { gte: today } }, _sum: { total: true } }),
             prisma.conversation.count({ where: { OR: [{ status: 'PENDING_HUMAN' }, { sentimentScore: { lte: 2 } }] } }),
             prisma.product.findMany({ where: { isActive: true, stock: { lte: 20 } }, select: { id: true, name: true, stock: true }, orderBy: { stock: 'asc' }, take: 5 }),
             prisma.conversation.aggregate({ _avg: { sentimentScore: true } }),
             prisma.user.count({ where: { role: 'CUSTOMER' } }),
+            prisma.order.count(),
         ]);
-        res.json({ todayOrders, todayRevenue: todayRevenue._sum.total || 0, pendingConversations, lowStockProducts, averageSentiment: sentimentAverage._avg.sentimentScore || 3, totalCustomers });
+        res.json({ todayOrders, todayRevenue: todayRevenue._sum.total || 0, pendingConversations, lowStockProducts, averageSentiment: sentimentAverage._avg.sentimentScore || 3, totalCustomers, totalOrders });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch dashboard stats' });
     }
