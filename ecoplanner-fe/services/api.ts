@@ -69,10 +69,11 @@ class ApiClient {
     }
 
     // Products
-    async getProducts(params?: { tag?: string; search?: string }) {
+    async getProducts(params?: { tag?: string; search?: string; categoryId?: string }) {
         const query = new URLSearchParams();
         if (params?.tag) query.set('tag', params.tag);
         if (params?.search) query.set('search', params.search);
+        if (params?.categoryId) query.set('categoryId', params.categoryId);
         return this.request<Product[]>(`/api/products${query.toString() ? `?${query}` : ''}`, { skipAuth: true });
     }
 

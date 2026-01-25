@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Plus, Search, Loader2, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Loader2, Check, Filter, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { api } from '../services/api';
+import { api, Category } from '../services/api';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 
@@ -9,6 +9,12 @@ const Shop: React.FC = () => {
   const { products, isLoading, error, filters, setFilters } = useProducts();
   const { addItem } = useCart();
   const [searchInput, setSearchInput] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+
+  useEffect(() => {
+    api.getCategories().then(setCategories).catch(console.error);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +56,90 @@ const Shop: React.FC = () => {
         </form>
       </div>
 
+      {/* Category Filter */}
+      <div className="flex items-center gap-3 overflow-x-auto pb-2 -mx-6 px-6 md:mx-0 md:px-0 scrollbar-none">
+        <button
+          onClick={() => setFilters({ ...filters, categoryId: undefined })}
+          className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold transition-all border ${!filters.categoryId
+            ? 'bg-charcoal text-white border-charcoal shadow-lg shadow-charcoal/20'
+            : 'bg-white text-stone-500 border-stone-200 hover:border-primary/50 hover:text-primary'
+            }`}
+        >
+          Tất cả
+        </button>
+        {/* Top 3 popular categories */}
+        {categories
+          .sort((a, b) => (b._count?.products || 0) - (a._count?.products || 0))
+          .slice(0, 3)
+          .map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setFilters({ ...filters, categoryId: cat.id })}
+              className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold transition-all border ${filters.categoryId === cat.id
+                ? 'bg-charcoal text-white border-charcoal shadow-lg shadow-charcoal/20'
+                : 'bg-white text-stone-500 border-stone-200 hover:border-primary/50 hover:text-primary'
+                }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+
+        <div className="h-6 w-px bg-stone-200 mx-2"></div>
+
+        <button
+          onClick={() => setShowFilterModal(true)}
+          className="flex-shrink-0 w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-primary hover:border-primary/50 transition-all active:scale-95"
+          title="Bộ lọc khác"
+        >
+          <Filter className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-display font-bold text-charcoal">Chọn danh mục</h3>
+              <button
+                onClick={() => setShowFilterModal(false)}
+                className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 hover:bg-stone-200 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-3 max-h-[60vh] overflow-y-auto p-1">
+              <button
+                onClick={() => {
+                  setFilters({ ...filters, categoryId: undefined });
+                  setShowFilterModal(false);
+                }}
+                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border ${!filters.categoryId
+                  ? 'bg-primary/10 text-primary border-primary'
+                  : 'bg-white text-stone-500 border-stone-200 hover:border-primary/50'
+                  }`}
+              >
+                Tất cả
+              </button>
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setFilters({ ...filters, categoryId: cat.id });
+                    setShowFilterModal(false);
+                  }}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border ${filters.categoryId === cat.id
+                    ? 'bg-primary/10 text-primary border-primary'
+                    : 'bg-white text-stone-500 border-stone-200 hover:border-primary/50'
+                    }`}
+                >
+                  {cat.name} <span className="text-xs opacity-60 font-normal ml-1">({cat._count?.products || 0})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
