@@ -26,6 +26,7 @@ router.get('/', async (req: Request, res: Response) => {
             take: parseInt(limit as string),
             skip: parseInt(offset as string),
             orderBy: { createdAt: 'desc' },
+            include: { category: true },
         });
         res.json(products);
     } catch (error) {
@@ -48,6 +49,7 @@ const createProductSchema = z.object({
     oldPrice: z.number().positive().optional(), description: z.string().optional(),
     image: z.string().url(), images: z.array(z.string().url()).optional(),
     tags: z.array(z.string()).optional(), stock: z.number().int().min(0).optional(),
+    categoryId: z.string().optional(),
 });
 
 router.post('/', authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res: Response) => {

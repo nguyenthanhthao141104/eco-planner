@@ -108,6 +108,12 @@ class ApiClient {
     }
 
     // Admin
+    async getCategories() { return this.request<Category[]>('/api/categories'); }
+    async getCategory(id: string) { return this.request<Category>(`/api/categories/${id}`); }
+    async createCategory(data: any) { return this.request<Category>('/api/categories', { method: 'POST', body: JSON.stringify(data) }); }
+    async updateCategory(id: string, data: any) { return this.request<Category>(`/api/categories/${id}`, { method: 'PATCH', body: JSON.stringify(data) }); }
+    async deleteCategory(id: string) { return this.request(`/api/categories/${id}`, { method: 'DELETE' }); }
+
     async getDashboard() { return this.request<DashboardStats>('/api/admin/dashboard'); }
     async getConversations(preview = false) {
         return this.request<Conversation[]>(`/api/admin/conversations${preview ? '?preview=true' : ''}`);
@@ -242,9 +248,14 @@ export interface User {
     preferences?: Record<string, unknown>;
 }
 
+export interface Category {
+    id: string; name: string; slug: string; description?: string; _count?: { products: number }; createdAt: string;
+}
+
 export interface Product {
     id: string; name: string; slug: string; price: number; oldPrice?: number;
     description?: string; descriptionAi?: string; image: string; images: string[]; tags: string[]; stock: number;
+    categoryId?: string; category?: Category;
 }
 
 export interface Message {

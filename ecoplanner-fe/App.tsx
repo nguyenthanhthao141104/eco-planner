@@ -25,6 +25,7 @@ import AdminBlogEditor from './pages/admin/BlogEditor';
 import AdminChat from './pages/admin/Chat';
 import Orders from './pages/Orders';
 import AdminSettings from './pages/admin/Settings';
+import AdminCategories from './pages/admin/Categories';
 import BlogDetail from './pages/BlogDetail';
 import Settings from './pages/Settings';
 
@@ -75,6 +76,7 @@ const App: React.FC = () => {
               <Route path="products" element={<AdminProducts />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="customers" element={<AdminCustomers />} />
+              <Route path="categories" element={<AdminCategories />} />
               <Route path="blog" element={<AdminBlogList />} />
               <Route path="blog/new" element={<AdminBlogEditor />} />
               <Route path="blog/edit/:id" element={<AdminBlogEditor />} />

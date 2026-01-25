@@ -46,8 +46,11 @@ model Product {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   orderItems    OrderItem[]
+  categoryId    String?
+  category      Category?   @relation(fields: [categoryId], references: [id])
 
   @@index([slug])
+  @@index([categoryId])
   @@index([isActive])
   @@index([tags])
 }
@@ -127,6 +130,16 @@ model BlogPost {
   @@index([slug])
   @@index([type])
   @@index([tags])
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model SystemSetting {

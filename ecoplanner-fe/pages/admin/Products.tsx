@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2, Loader2, X, Save, Upload } from 'lucide-react';
-import { api, Product } from '../../services/api';
+import { api, Product, Category } from '../../services/api';
 
 interface ProductFormData {
    name: string;
@@ -12,14 +12,16 @@ interface ProductFormData {
    images: string[];
    tags: string[];
    stock: number;
+   categoryId?: string;
 }
 
 const emptyForm: ProductFormData = {
-   name: '', slug: '', price: 0, description: '', image: '', images: [], tags: [], stock: 0
+   name: '', slug: '', price: 0, description: '', image: '', images: [], tags: [], stock: 0, categoryId: ''
 };
 
 const AdminProducts: React.FC = () => {
    const [products, setProducts] = useState<Product[]>([]);
+   const [categories, setCategories] = useState<Category[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [searchTerm, setSearchTerm] = useState('');
 
@@ -42,10 +44,14 @@ const AdminProducts: React.FC = () => {
    const loadProducts = async () => {
       try {
          setIsLoading(true);
-         const data = await api.getProducts();
-         setProducts(data);
+         const [productsData, categoriesData] = await Promise.all([
+            api.getProducts(),
+            api.getCategories()
+         ]);
+         setProducts(productsData);
+         setCategories(categoriesData);
       } catch (error) {
-         console.error('Failed to load products:', error);
+         console.error('Failed to load data:', error);
       } finally {
          setIsLoading(false);
       }
@@ -70,6 +76,7 @@ const AdminProducts: React.FC = () => {
          images: product.images || [],
          tags: product.tags || [],
          stock: product.stock,
+         categoryId: product.categoryId || '',
       });
       setFormError('');
       setShowModal(true);
@@ -195,7 +202,7 @@ const AdminProducts: React.FC = () => {
          <div className="flex flex-col gap-4">
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
                <div className="col-span-5">Sản phẩm</div>
-               <div className="col-span-2 text-center">Trạng thái</div>
+               <div className="col-span-2 text-center">Danh mục</div>
                <div className="col-span-2 text-center">Tồn kho</div>
                <div className="col-span-2 text-right">Giá</div>
                <div className="col-span-1 text-right">Hành động</div>
@@ -224,7 +231,13 @@ const AdminProducts: React.FC = () => {
                         </div>
                      </div>
                      <div className="col-span-1 md:col-span-2 flex md:justify-center">
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${status.color}`}>{status.text}</span>
+                        {p.category ? (
+                           <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-cream text-charcoal border border-stone-200">
+                              {p.category.name}
+                           </span>
+                        ) : (
+                           <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${status.color}`}>{status.text}</span>
+                        )}
                      </div>
                      <div className="col-span-1 md:col-span-2 flex md:justify-center font-medium text-gray-600">{p.stock} sản phẩm</div>
                      <div className="col-span-1 md:col-span-2 flex md:justify-end font-bold text-[#1a2e24]">{formatPrice(p.price)}</div>
@@ -282,6 +295,20 @@ const AdminProducts: React.FC = () => {
                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#129ca1] focus:border-transparent"
                            placeholder="so-planner-2025"
                         />
+                     </div>
+                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục *</label>
+                        <select
+                           value={formData.categoryId}
+                           onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#129ca1] focus:border-transparent bg-white"
+                           required
+                        >
+                           <option value="">Chọn danh mục</option>
+                           {categories.map(c => (
+                              <option key={c.id} value={c.id}>{c.name}</option>
+                           ))}
+                        </select>
                      </div>
                      <div className="grid grid-cols-2 gap-4">
                         <div>

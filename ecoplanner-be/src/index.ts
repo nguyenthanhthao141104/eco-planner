@@ -19,6 +19,7 @@ import paymentRoutes from './controllers/payment';
 import blogRoutes from './controllers/blogs';
 import uploadRoutes from './controllers/uploads';
 import settingsRoutes from './controllers/settings';
+import categoryRoutes from './controllers/categories';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -61,6 +62,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

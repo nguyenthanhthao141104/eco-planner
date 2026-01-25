@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBag, MessageSquare, Users, Settings, Leaf, Box, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, MessageSquare, Users, Settings, Leaf, Box, LogOut, User, Tags } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const AdminLayout: React.FC = () => {
@@ -28,6 +28,10 @@ const AdminLayout: React.FC = () => {
           <NavLink to="/admin/products" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${isActive ? 'bg-[#9CAF88] text-[#1a2e24] font-bold shadow-lg' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>
             <Box className="w-5 h-5" />
             <span>Sản phẩm</span>
+          </NavLink>
+          <NavLink to="/admin/categories" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${isActive ? 'bg-[#9CAF88] text-[#1a2e24] font-bold shadow-lg' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>
+            <Tags className="w-5 h-5" />
+            <span>Danh mục</span>
           </NavLink>
           <NavLink to="/admin/blog" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${isActive ? 'bg-[#9CAF88] text-[#1a2e24] font-bold shadow-lg' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>
             <Leaf className="w-5 h-5" />
