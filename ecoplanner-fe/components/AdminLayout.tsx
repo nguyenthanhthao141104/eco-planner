@@ -121,13 +121,13 @@ const AdminLayout: React.FC = () => {
 
       {/* Mobile Drawer */}
       <aside
-        className={`lg:hidden fixed top-0 left-0 h-full w-72 bg-[#2C4C3B] z-50 flex flex-col shadow-2xl transform transition-transform duration-300 ease-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`lg:hidden fixed top-0 right-0 h-full w-72 bg-[#2C4C3B] z-50 flex flex-col shadow-2xl transform transition-transform duration-300 ease-out ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         {/* Close button */}
         <button
           onClick={() => setIsSidebarOpen(false)}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+          className="absolute top-4 left-4 w-8 h-8 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all"
         >
           <X className="w-5 h-5" />
         </button>
