@@ -27,7 +27,7 @@ const About: React.FC = () => {
    ];
 
    return (
-      <div className="bg-[#FDFCF9]">
+      <div className="bg-paper">
          {/* Hero - Simple & Organic */}
          <section className="max-w-5xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28 text-center">
             <div className="inline-flex items-center gap-2 text-primary/80 text-sm font-medium mb-6">
