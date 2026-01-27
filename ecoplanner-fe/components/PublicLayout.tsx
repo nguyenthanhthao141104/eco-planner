@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, Leaf, Send, Sparkles, X, LogIn, Instagram, Facebook, Phone, Home, Package, BookOpen, Info, Settings, ClipboardList, LogOut } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, Leaf, Send, Sparkles, X, LogIn, Instagram, Facebook, Phone, Home, Package, BookOpen, Info, Settings, ClipboardList, LogOut, HelpCircle, ChevronRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../hooks/useChat';
@@ -11,9 +11,38 @@ const parseMarkdown = (text: string) => {
   return text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 };
 
+// FAQ Questions data
+const faqQuestions = [
+  {
+    question: 'Shop có những loại sổ planner nào?',
+    answer: 'Shop hiện có 3 loại: B6 – Daily planner (120 trang), B5 – Weekly planner (80 trang), A5 – Yearly planner (120 trang).'
+  },
+  {
+    question: 'Thời gian giao hàng bao lâu?',
+    answer: 'Xử lý đơn: 0-24h. Giao nội thành: 1-2 ngày. Giao tỉnh: 2-5 ngày.'
+  },
+  {
+    question: 'Phí ship như thế nào?',
+    answer: 'FREESHIP cho tất cả đơn hàng ạ.'
+  },
+  {
+    question: 'Shop có chính sách đổi/trả không?',
+    answer: 'Shop hỗ trợ đổi mới 1-1 khi lỗi nhà sản xuất (rách/bung gáy/thiếu trang/in lỗi) trong 7 ngày từ khi nhận hàng.'
+  },
+  {
+    question: 'Bìa tái chế có bền không?',
+    answer: 'Bìa dùng giấy tái chế 250gsm nên đủ cứng và chắc, hạn chế cong/gãy trong sử dụng bình thường.'
+  },
+  {
+    question: 'Bên trong sổ có nội dung gì?',
+    answer: 'B6: Daily Planner với Top 3 mục tiêu, lịch trình, checklist. B5: Weekly với theo dõi thói quen. A5: Kế hoạch năm-tháng-tuần-ngày đầy đủ.'
+  }
+];
+
 const PublicLayout: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showFaq, setShowFaq] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [settings, setSettings] = useState<SystemSettings>(DEFAULT_SETTINGS);
   const { totalItems } = useCart();
@@ -60,6 +89,15 @@ const PublicLayout: React.FC = () => {
       sendMessage(chatInput);
       setChatInput('');
     }
+  };
+
+  const handleFaqClick = (faq: typeof faqQuestions[0]) => {
+    if (!isAuthenticated) {
+      alert('Vui lòng đăng nhập để chat với MEDE-Assistant');
+      return;
+    }
+    sendMessage(faq.question);
+    setShowFaq(false);
   };
 
   const navItems = [
@@ -387,19 +425,55 @@ const PublicLayout: React.FC = () => {
               )}
             </div>
 
+            {/* FAQ Suggestions Panel */}
+            {showFaq && (
+              <div className="border-t border-stone-100 bg-white p-3 max-h-64 overflow-y-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2 text-charcoal font-bold text-sm">
+                    <HelpCircle className="w-4 h-4 text-primary" />
+                    Câu hỏi thường gặp
+                  </div>
+                  <button onClick={() => setShowFaq(false)} className="p-1 hover:bg-stone-100 rounded-full">
+                    <X className="w-4 h-4 text-stone-400" />
+                  </button>
+                </div>
+                <div className="space-y-1">
+                  {faqQuestions.map((faq, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleFaqClick(faq)}
+                      className="w-full flex items-center justify-between p-3 text-left text-sm text-charcoal/80 hover:bg-stone-50 rounded-xl transition-colors group"
+                    >
+                      <span className="pr-2">{faq.question}</span>
+                      <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-primary flex-shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSendMessage} className="p-3 border-t border-stone-100 bg-white">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder={isAuthenticated ? 'Hỏi về sản phẩm...' : 'Đăng nhập để chat...'}
-                  disabled={!isAuthenticated}
-                  className="w-full pl-4 pr-10 py-3 rounded-xl bg-stone-50 border-none text-sm focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                <button type="submit" className="absolute right-2 top-2 p-1 text-primary hover:bg-primary/10 rounded-lg">
-                  <Send className="w-4 h-4" />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFaq(!showFaq)}
+                  className={`p-3 rounded-xl transition-colors flex-shrink-0 ${showFaq ? 'bg-primary text-white' : 'bg-stone-50 text-primary hover:bg-primary/10'}`}
+                >
+                  <HelpCircle className="w-4 h-4" />
                 </button>
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder={isAuthenticated ? 'Hỏi về sản phẩm...' : 'Đăng nhập để chat...'}
+                    disabled={!isAuthenticated}
+                    className="w-full pl-4 pr-10 py-3 rounded-xl bg-stone-50 border-none text-sm focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <button type="submit" className="absolute right-2 top-2 p-1 text-primary hover:bg-primary/10 rounded-lg">
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </form>
           </div>
