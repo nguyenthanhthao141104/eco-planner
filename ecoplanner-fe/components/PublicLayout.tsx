@@ -15,27 +15,60 @@ const parseMarkdown = (text: string) => {
 const faqQuestions = [
   {
     question: 'Shop có những loại sổ planner nào?',
-    answer: 'Shop hiện có 3 loại: B6 – Daily planner (120 trang), B5 – Weekly planner (80 trang), A5 – Yearly planner (120 trang).'
+    answer: `Shop hiện có **3 loại sổ**:
+
+• **B6 – Daily Planner** (theo ngày): 120 trang, gọn nhẹ mang theo.
+
+• **B5 – Weekly Planner** (theo tuần): 80 trang, nhìn tổng quan cả tuần.
+
+• **A5 – Yearly Planner** (theo năm): 120 trang, lập kế hoạch năm-tháng-tuần-ngày.`
   },
   {
     question: 'Thời gian giao hàng bao lâu?',
-    answer: 'Xử lý đơn: 0-24h. Giao nội thành: 1-2 ngày. Giao tỉnh: 2-5 ngày.'
+    answer: `**Thời gian giao hàng:**
+
+• Xử lý đơn: **0 – 24 giờ**
+
+• Giao nội thành: **1 – 2 ngày**
+
+• Giao tỉnh: **2 – 5 ngày**`
   },
   {
     question: 'Phí ship như thế nào?',
-    answer: 'FREESHIP cho tất cả đơn hàng ạ.'
+    answer: `🎉 **FREESHIP** cho tất cả đơn hàng ạ!`
   },
   {
     question: 'Shop có chính sách đổi/trả không?',
-    answer: 'Shop hỗ trợ đổi mới 1-1 khi lỗi nhà sản xuất (rách/bung gáy/thiếu trang/in lỗi) trong 7 ngày từ khi nhận hàng.'
+    answer: `**Chính sách đổi/trả:**
+
+• Đổi mới **1-1** khi lỗi nhà sản xuất (rách, bung gáy, thiếu trang, in lỗi nặng).
+
+• Thời hạn: **7 ngày** từ khi nhận hàng.
+
+• Cần gửi ảnh/video tình trạng để xử lý nhanh.
+
+⚠️ Không áp dụng nếu sản phẩm đã sử dụng/viết hoặc hư hỏng do bảo quản sai.`
   },
   {
     question: 'Bìa tái chế có bền không?',
-    answer: 'Bìa dùng giấy tái chế 250gsm nên đủ cứng và chắc, hạn chế cong/gãy trong sử dụng bình thường.'
+    answer: `✅ **Rất bền** ạ!
+
+Bìa sử dụng giấy tái chế **250gsm** nên:
+• Đủ cứng và chắc
+• Hạn chế cong/gãy
+• Phù hợp sử dụng hàng ngày
+
+Mỗi cuốn có nét riêng do bề mặt giấy tái chế tự nhiên.`
   },
   {
     question: 'Bên trong sổ có nội dung gì?',
-    answer: 'B6: Daily Planner với Top 3 mục tiêu, lịch trình, checklist. B5: Weekly với theo dõi thói quen. A5: Kế hoạch năm-tháng-tuần-ngày đầy đủ.'
+    answer: `**Nội dung bên trong:**
+
+📘 **B6 (Daily):** Top 3 mục tiêu, Lịch trình, Việc cần làm (checklist), Ghi chú, Việc cho ngày mai.
+
+📗 **B5 (Weekly):** Lịch tuần Thứ 2-CN, Ưu tiên, Việc cần làm, Theo dõi thói quen.
+
+📙 **A5 (Yearly):** Lịch 2026, Tầm nhìn, Kế hoạch năm/tháng/tuần, Daily Plan 72 trang, Tổng kết.`
   }
 ];
 
