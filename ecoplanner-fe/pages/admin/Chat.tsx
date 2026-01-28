@@ -97,7 +97,7 @@ const AdminChat: React.FC = () => {
                />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-3 md:pb-4 scrollbar-none -mx-4 px-4 md:mx-0 md:px-0">
-               {['Tất cả', 'Đang hoạt động', 'Đã xử lý'].map((tab, i) => (
+               {['Tất cả'].map((tab, i) => (
                   <button
                      key={tab}
                      className={`px-3 md:px-4 py-1.5 text-xs font-medium rounded-full whitespace-nowrap flex-shrink-0 ${i === 0 ? 'bg-[#53d22d] text-black font-bold' : 'bg-[#2e4328] text-gray-300'}`}
