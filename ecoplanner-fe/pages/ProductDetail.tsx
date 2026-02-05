@@ -116,7 +116,7 @@ const ProductDetail: React.FC = () => {
 
                      <div className="flex items-center gap-6 pt-2">
                         <div className="flex items-center gap-2 text-xs font-bold text-charcoal/60 uppercase tracking-wide">
-                           <Truck className="w-5 h-5" /> Free Ship &gt; 500k
+                           <Truck className="w-5 h-5" /> Free Ship &gt; 250k
                         </div>
                         <div className="flex items-center gap-2 text-xs font-bold text-charcoal/60 uppercase tracking-wide">
                            <ShieldCheck className="w-5 h-5" /> Bảo hành 1 tháng
