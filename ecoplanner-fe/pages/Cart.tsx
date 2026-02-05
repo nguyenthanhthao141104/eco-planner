@@ -9,8 +9,8 @@ const Cart: React.FC = () => {
 
     const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price) + 'đ';
 
-    const shippingFee = totalPrice >= 500000 ? 0 : 30000;
-    const discount = shippingFee > 0 ? 15000 : 30000;
+    const shippingFee = 0;
+    const discount = totalPrice >= 300000 ? 15000 : 0;
     const finalTotal = totalPrice + shippingFee - discount;
 
     if (items.length === 0) {

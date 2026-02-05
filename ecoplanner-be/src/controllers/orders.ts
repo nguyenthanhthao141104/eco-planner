@@ -53,9 +53,9 @@ router.post('/', authMiddleware, async (req: AuthenticatedRequest, res: Response
         }
 
         // Calculate shipping and discount
-        const shippingFee = total >= 500000 ? 0 : 30000;
-        const discount = shippingFee > 0 ? 15000 : 30000;
-        const finalTotal = total + shippingFee - discount;
+        const shippingFee = 0;
+        const discount = totalPrice >= 300000 ? 15000 : 0;
+        const finalTotal = totalPrice + shippingFee - discount;
 
         // Create order
         const order = await prisma.order.create({
