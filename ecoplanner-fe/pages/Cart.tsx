@@ -80,7 +80,7 @@ const Cart: React.FC = () => {
                     {/* Eco Note */}
                     <div className="bg-primary/5 rounded-2xl p-4 flex items-center gap-4 text-sm text-primary/80">
                         <Leaf className="w-5 h-5 text-primary" />
-                        <p>Đơn hàng này giúp giảm thiểu 1.5kg khí thải CO2 thông qua việc sử dụng bao bì phân hủy sinh học.</p>
+                        <p>Hãy mua ngay để nhận được ưu đãi hấp dẫn trong dịp khai trương nhé!</p>
                     </div>
                 </div>
 
