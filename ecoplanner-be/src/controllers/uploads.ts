@@ -1,23 +1,28 @@
 import { Router, Response } from 'express';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { authMiddleware, adminMiddleware, AuthenticatedRequest } from '../middleware/auth';
 
 const router = Router();
 
-// Configure storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path.join(process.cwd(), 'uploads');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Configure Cloudinary Storage
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: async (req, file) => {
+        return {
+            folder: 'eco-planner/products',
+            allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+            transformation: [{ width: 1200, quality: 'auto', fetch_format: 'auto' }],
+            public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, '')}`,
+        };
     },
 });
 
@@ -26,7 +31,7 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
         const allowedTypes = /jpeg|jpg|png|webp|gif/;
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const extname = allowedTypes.test(file.originalname.toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
         if (extname && mimetype) {
             return cb(null, true);
@@ -42,7 +47,8 @@ router.post('/', authMiddleware, adminMiddleware, upload.single('file'), (req: A
             return res.status(400).json({ error: 'Không có file nào được upload' });
         }
 
-        const fileUrl = `/uploads/${req.file.filename}`;
+        // Cloudinary returns the full URL in req.file.path
+        const fileUrl = req.file.path;
         res.json({ url: fileUrl });
     } catch (error) {
         res.status(500).json({ error: 'Upload failed' });

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Star, CheckCircle, Minus, Plus, ShoppingCart, Truck, ShieldCheck, Loader2, ArrowLeft, Check } from 'lucide-react';
 import { useProduct } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
+import { api } from '../services/api';
 const ProductDetail: React.FC = () => {
    const { id } = useParams<{ id: string }>();
    const { product, isLoading, error } = useProduct(id || '');
@@ -45,13 +46,18 @@ const ProductDetail: React.FC = () => {
                {/* Left: Images */}
                <div className="lg:col-span-7 flex flex-col gap-4">
                   <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden bg-stone-100 group relative">
-                     <img src={product.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1200'} className="w-full h-full object-cover" alt={product.name} />
+                     <img
+                        src={product.image ? (product.image.startsWith('http') ? product.image : `${api.baseUrl}${product.image}`) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1200'}
+                        className="w-full h-full object-cover"
+                        alt={product.name}
+                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1200'; }}
+                     />
                   </div>
                   {product.images && product.images.length > 0 && (
                      <div className="grid grid-cols-3 gap-4">
                         {product.images.slice(0, 3).map((img, i) => (
                            <div key={i} className={`aspect-square rounded-2xl overflow-hidden bg-stone-100 cursor-pointer ${i === 0 ? 'ring-2 ring-primary ring-offset-2' : 'opacity-70 hover:opacity-100'}`}>
-                              <img src={img} className="w-full h-full object-cover" alt={`${product.name} ${i + 1}`} />
+                              <img src={img?.startsWith('http') ? img : `${api.baseUrl}${img}`} className="w-full h-full object-cover" alt={`${product.name} ${i + 1}`} />
                            </div>
                         ))}
                      </div>
@@ -116,7 +122,7 @@ const ProductDetail: React.FC = () => {
 
                      <div className="flex items-center gap-6 pt-2">
                         <div className="flex items-center gap-2 text-xs font-bold text-charcoal/60 uppercase tracking-wide">
-                           <Truck className="w-5 h-5" /> Free Ship &gt; 250k
+                           <Truck className="w-5 h-5" /> Free Ship &gt; 500k
                         </div>
                         <div className="flex items-center gap-2 text-xs font-bold text-charcoal/60 uppercase tracking-wide">
                            <ShieldCheck className="w-5 h-5" /> Bảo hành 1 tháng
