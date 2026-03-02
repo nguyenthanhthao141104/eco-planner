@@ -49,6 +49,40 @@ async function main() {
     }
     console.log('✅ Users ensured');
 
+    // 2.5. CATEGORIES
+    console.log('📂 Seeding categories...');
+    const categoriesData = [
+        {
+            name: 'Sổ Planner',
+            slug: 'so-planner',
+            description: 'Lên kế hoạch chi tiết cho từng ngày với thiết kế tối giản.',
+            image: 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=800',
+        },
+        {
+            name: 'Sticker Trang Trí',
+            slug: 'sticker-trang-tri',
+            description: 'Thêm màu sắc cho trang viết.',
+            image: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=800',
+        },
+        {
+            name: 'Bút & Phụ Kiện',
+            slug: 'but-phu-kien',
+            description: 'Dụng cụ viết êm ái, bền bỉ.',
+            image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800',
+        },
+    ];
+
+    const categoryRecords: any[] = [];
+    for (const c of categoriesData) {
+        const cat = await prisma.category.upsert({
+            where: { slug: c.slug },
+            update: {},
+            create: c,
+        });
+        categoryRecords.push(cat);
+    }
+    console.log(`✅ ${categoryRecords.length} categories ensured`);
+
     // 3. PRODUCTS
     console.log('📦 Seeding products...');
     const productsData = [
@@ -267,6 +301,34 @@ async function main() {
         products.push(prod);
     }
     console.log(`✅ \${products.length} products ensured`);
+
+    // 3.5. ASSIGN PRODUCTS TO CATEGORIES
+    console.log('🔗 Assigning products to categories...');
+    const plannerSlugs = [
+        'so-planner-2025-minimalist', 'weekly-planner-pastel-dreams', 'daily-planner-premium-a5',
+        'goal-planner-vision-board', 'budget-planner-pro', 'fitness-planner-tracker',
+        'student-planner-academic', 'travel-planner-adventure', 'meal-planner-recipe-book',
+        'self-care-planner-wellness', 'wedding-planner-complete', 'undated-monthly-planner',
+        'project-planner-professional', 'baby-planner-first-year', 'business-planner-executive',
+    ];
+    const stickerSlugs = [
+        'creative-planner-artistic', 'bullet-journal-dotted-a5',
+        'gratitude-journal-daily', 'reading-log-book-tracker',
+    ];
+    const accessorySlugs = [
+        'habit-tracker-100-days',
+    ];
+
+    for (const slug of plannerSlugs) {
+        await prisma.product.updateMany({ where: { slug, categoryId: null }, data: { categoryId: categoryRecords[0].id } });
+    }
+    for (const slug of stickerSlugs) {
+        await prisma.product.updateMany({ where: { slug, categoryId: null }, data: { categoryId: categoryRecords[1].id } });
+    }
+    for (const slug of accessorySlugs) {
+        await prisma.product.updateMany({ where: { slug, categoryId: null }, data: { categoryId: categoryRecords[2].id } });
+    }
+    console.log('✅ Products assigned to categories');
 
     // 4. BLOG POSTS
     console.log('📝 Seeding blog posts (sequential with upsert)...');
