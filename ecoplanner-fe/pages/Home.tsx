@@ -112,10 +112,10 @@ const Home: React.FC = () => {
           </div>
           <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-6">
             {[
-              { icon: Leaf, title: "Chất liệu thân thiện", desc: "100% giấy tái chế cao cấp, mực in hữu cơ." },
+              { icon: Leaf, title: "Chất liệu thân thiện", desc: "100% giấy tái chế cao cấp." },
               { icon: PenTool, title: "Thiết kế tối giản", desc: "Layout thoáng đãng, tập trung vào trải nghiệm viết." },
               { icon: Sprout, title: "Tư duy Mindfulness", desc: "Tích hợp theo dõi cảm xúc và lòng biết ơn." },
-              { icon: Truck, title: "Giao hàng xanh", desc: "Đóng gói không nilon, hộp carton tái chế." },
+              { icon: Truck, title: "Giao hàng xanh", desc: "Đóng gói không nilon, hộp carton." },
             ].map((feature, idx) => (
               <div key={idx} className="p-6 rounded-2xl bg-paper border border-stone-100 hover:bg-cream/50 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
