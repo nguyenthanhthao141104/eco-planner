@@ -28,7 +28,7 @@ const Home: React.FC = () => {
             <span className="text-primary italic">Cuộc Sống Cân Bằng</span>
           </h1>
           <p className="font-body text-lg text-charcoal/70 leading-relaxed mb-8 max-w-lg">
-            Khám phá bộ sưu tập planner thủ công và kỹ thuật số giúp bạn tìm thấy sự an yên trong từng trang viết.
+            Khám phá bộ sưu tập planner với giấy bìa làm hoàn toàn bằng 100% giấy tái chế.
           </p>
           <div className="flex gap-4">
             <Link to="/shop" className="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-xl shadow-primary/20 flex items-center gap-2">
