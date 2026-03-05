@@ -21,7 +21,7 @@ const Home: React.FC = () => {
         <div className="flex-1 flex flex-col justify-center items-start z-10 lg:pl-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-6">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            Bộ sưu tập mới 2024
+            Bộ sưu tập mới 2026
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-charcoal leading-[1.1] mb-6">
             Lên Kế Hoạch Cho <br className="hidden lg:block" />
