@@ -4,7 +4,7 @@ dockerfilePath = "ecoplanner-be/Dockerfile"
 watchPatterns = ["ecoplanner-be/**"]
 
 [deploy]
-startCommand = "npx prisma db push && npm start"
+startCommand = "npm start"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
